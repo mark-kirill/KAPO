@@ -3,3 +3,120 @@ BASE_URL = "http://192.168.4.1"
 
 def encode_color(color_hex: str) -> str:
     return color_hex.replace("#", "%23")
+
+# test_overload_stability.py
+import requests
+import time
+import random
+from common import BASE_URL, encode_color
+
+def random_color():
+    return "#{:02X}{:02X}{:02X}".format(
+        random.randint(0, 255),
+        random.randint(0, 255),
+        random.randint(0, 255)
+    )
+
+def send_set_command():
+    color = random_color()
+    url = f"{BASE_URL}/set?value={encode_color(color)}"
+    try:
+        start = time.time()
+        resp = requests.get(url, timeout=1)
+        latency = time.time() - start
+        return latency, resp.status_code
+    except requests.exceptions.RequestException:
+        return None, None
+
+def test_overload():
+    print("=== Тест на перегрузку ESP32 ===")
+    rates = [10, 20, 50, 75, 100, 150]  # команд в секунду
+    stop = False
+
+    for rate in rates:
+        interval = 1.0 / rate
+        print(f"\n📶 Отправляем {rate} команд/сек")
+
+        latencies = []
+        timeouts = 0
+
+        start_time = time.time()
+        while time.time() - start_time < 5:
+            latency, status = send_set_command()
+            if latency is not None:
+                latencies.append(latency)
+            else:
+                timeouts += 1
+            time.sleep(interval)
+
+        if not latencies:
+            print("❌ ESP32 не отвечает вообще.")
+            break
+
+        avg_latency = sum(latencies) / len(latencies)
+        max_latency = max(latencies)
+
+        print(f"Средняя задержка: {avg_latency:.3f} сек")
+        print(f"Макс. задержка: {max_latency:.3f} сек")
+        print(f"Потерь: {timeouts}")
+
+        if avg_latency > 0.5 or timeouts > 0:
+            print("❗ Обнаружены признаки перегрузки.")
+            stop = True
+            break
+
+    print("\n⏳ Проверка восстановления...")
+    time.sleep(3)
+
+    try:
+        resp = requests.get(f"{BASE_URL}/get", timeout=2)
+        if resp.status_code == 200:
+            print("✅ Устройство восстановилось.")
+        else:
+            print("❌ Устройство не восстановилось.")
+    except:
+        print("❌ Нет ответа от ESP32.")
+
+if __name__ == "__main__":
+    test_overload()
+
+
+# test_visual_smoothness.py
+import time
+import requests
+from common import BASE_URL, encode_color
+
+FREQUENCIES_HZ = [1, 2, 5, 10, 20, 50]
+DURATION = 5  # секунд на каждый тест
+
+COLORS = ["#FF0000", "#00FF00", "#0000FF"]  # красный, зелёный, синий
+
+def cycle_colors(freq_hz):
+    delay = 1.0 / freq_hz
+    print(f"\nТест частоты: {freq_hz} Гц (задержка {delay:.3f} сек)")
+
+    start_time = time.time()
+    i = 0
+    while time.time() - start_time < DURATION:
+        color = COLORS[i % len(COLORS)]
+        requests.get(f"{BASE_URL}/set?value={encode_color(color)}", timeout=1)
+        time.sleep(delay)
+        i += 1
+
+def main():
+    print("=== Визуальный тест плавности смены цвета LED ===\n")
+    print("Смотри на M5 Atom. Ответь после каждого теста.\n")
+
+    for freq in FREQUENCIES_HZ:
+        cycle_colors(freq)
+        answer = input("Смена цвета была плавной и различимой? (да/нет): ").strip().lower()
+        if answer == "нет":
+            print(f"\n❗ Максимально допустимая частота: {freq} Гц")
+            break
+    else:
+        print("\n✅ Все частоты до 50 Гц прошли успешно.")
+
+if __name__ == "__main__":
+    main()
+
+
