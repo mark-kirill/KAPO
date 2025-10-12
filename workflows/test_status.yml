@@ -1,0 +1,24 @@
+name: Auto Test Status
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  set-not-tested:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Replace test status in README
+        run: |
+          sed -i 's/🧪 Статус тестов: \*\*TESTED\*\*/🧪 Статус тестов: **NOT TESTED**/' README.md || true
+          sed -i 's/🧪 Статус тестов: \*\*NOT TESTED\*\*/🧪 Статус тестов: **NOT TESTED**/' README.md || true
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git diff --quiet || (git commit -am "🔁 Обновлён статус тестов: NOT TESTED" && git push)
