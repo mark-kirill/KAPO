@@ -1,25 +1,5 @@
-import requests
+# common.py
+BASE_URL = "http://192.168.4.1"
 
-
-BASE_URL = "http://192.168.4.1"  
-
-def test_get_led_color():
-    response = requests.get(f"{BASE_URL}/get")
-    assert response.status_code == 200
-    assert response.text.startswith("#")
-    assert len(response.text.strip()) == 7
-
-def test_set_valid_color():
-    color = "#00FF00"  # Зелёный
-    response = requests.get(f"{BASE_URL}/set?value={color}")
-    assert response.status_code == 200
-    assert color in response.text
-
-def test_set_invalid_color():
-    color = "invalid"
-    response = requests.get(f"{BASE_URL}/set?value={color}")
-    assert response.status_code == 400  # ожидаем ошибку от сервера
-
-def test_set_missing_value():
-    response = requests.get(f"{BASE_URL}/set")
-    assert response.status_code == 400
+def encode_color(color_hex: str) -> str:
+    return color_hex.replace("#", "%23")
