@@ -14,8 +14,8 @@ jobs:
 
       - name: Replace test status in README
         run: |
-          sed -i 's/🧪 Статус тестов: \*\*TESTED\*\*/🧪 Статус тестов: **NOT TESTED**/' README.md || true
-          sed -i 's/🧪 Статус тестов: \*\*NOT TESTED\*\*/🧪 Статус тестов: **NOT TESTED**/' README.md || true
+          sed -i 's/🧪 Status: \*\*TESTED\*\*/🧪 Статус тестов: **NOT TESTED**/' README.md || true
+          sed -i 's/🧪 Status: \*\*NOT TESTED\*\*/🧪 Статус тестов: **NOT TESTED**/' README.md || true
 
       - name: Commit and push if changed
         run: |
