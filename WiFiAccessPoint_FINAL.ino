@@ -2,24 +2,30 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
+#include <Preferences.h>
+#include <DNSServer.h>
 
-// Set your WiFi credentials
-const char *ssid = "KAPO_TEAM";
-const char *password = "66666666";
+// WiFi ssid ja salasõna seadistamise jaoks
+Preferences prefs;
+String ssid = "KAPO_TEAM";
+String password = "66666666";
 
+//Paneme käima WiFi ja DNS serverid
+const byte DNS_PORT = 53;
+DNSServer dnsServer;
 WiFiServer server(80);
 
-// Для хранения текущего цвета светодиода
+// Praeguse LED värvi hoidmiseks
 uint8_t currentRed = 0;
 uint8_t currentGreen = 0;
 uint8_t currentBlue = 0;
 
-// Флажок аутентификации (в реальном проекте используйте сессии или токены)
-bool isAuthenticated = false;
+// Autentifitseerimise bool (päris projektis tuleks kasutada kas sessioone või tokeneid)
+bool isAuthenticated = true;
 String authUsername = "admin";
 String authPassword = "1234";
 
-// Прототипы функций
+// Funktsioonide prototüübid
 void sendAutoRedirect(WiFiClient client);
 void sendAuthPage(WiFiClient client);
 void handleLogin(WiFiClient client, String request);
@@ -28,22 +34,46 @@ void handleSetRequest(WiFiClient &client, String request);
 String getColorHex();
 void setColorFromHex(String hexColor);
 bool checkAuthentication(String request);
+void handleWiFiSettings(WiFiClient &client, String request);
+void clearPreferences();
 
 void setup() {
-  M5.begin(true, false, true);  // Инициализация M5Atom (LED, Serial, I2C)
+  Serial.begin(115200);
+  M5.begin(true, false, true);  // Paneme käima M5Atom (LED, Serial, I2C)
+
+  //Loeme wifi andmed mälus
+  clearPreferences(); //Kasutame kui soovime puhastada M5Atom mälu, muidu las jääb välja kommenteerituna
+  prefs.begin("wifi-info", true);
+  ssid = prefs.getString("ssid", "KAPO_TEAM");
+  password = prefs.getString("password", "66666666");
+  prefs.end();
+
+  //Jätame aega qr koodi skripri jaoks
+  delay(5000);
+  
+  //QR koodi skripti jaoks
+  Serial.print("SSID: ");
+  Serial.println(ssid);
+  Serial.print("password: ");
+  Serial.println(password);
+
   Serial.println("\nWIFI ACCESS POINT");
   Serial.printf("Please connect: %s \nThen access to:", ssid);
 
-  WiFi.softAP(ssid, password);  // Создаём точку доступа
-  IPAddress myIP = WiFi.softAPIP();  // Получаем IP адрес
+  WiFi.softAP(ssid.c_str(), password.c_str());  // Loome AP
+  IPAddress myIP = WiFi.softAPIP();  // Meie IP aadress
   Serial.println(myIP);
-  
-  server.begin();  // Запускаем сервер
+
+  // Käivitame DNS, et kõik domeenid viisid meie IP-ni
+  dnsServer.start(DNS_PORT, "*", myIP);
+
+  server.begin();  // Server läheb tääle
   Serial.println("Server started on port 80");
 }
 
 void loop() {
-  WiFiClient client = server.available();  // Ожидаем клиента
+  dnsServer.processNextRequest();
+  WiFiClient client = server.available();  // Ootame kliendi
 
   if (client) {
     Serial.println("New client connected");
@@ -56,23 +86,23 @@ void loop() {
         Serial.write(c);
         request += c;
 
-        // Конец HTTP запроса
+        // HTTP päringu lõpp
         if (c == '\n') {
-          // Проверяем аутентификацию для защищенных страниц
+          // Kontrollime autentimist kaitsud leheküljede jaoks
           bool requiresAuth = (request.indexOf("GET / ") != -1 || 
                               request.indexOf("GET /get") != -1 || 
                               request.indexOf("GET /set") != -1);
           
           if (requiresAuth && !isAuthenticated) {
-            // Пользователь не аутентифицирован - отправляем на страницу логина
+            // Kasutaja pole autentinud, seega saadame sisselogimise lehele
             sendAutoRedirect(client);
           }
           else if (request.indexOf("GET / ") != -1 && isAuthenticated) {
-            // Главная страница для аутентифицированных пользователей
+            // Põhilehekülg autentifitseeritud kasutajatele
             sendHTMLResponse(client);
           }
           else if (request.indexOf("GET /auth") != -1) {
-            // Страница аутентификации
+            // Autentimise lehekülg
             sendAuthPage(client);
           }
           else if (request.indexOf("GET /get") != -1 && isAuthenticated) {
@@ -82,16 +112,20 @@ void loop() {
             handleSetRequest(client, request);
           }
           else if (request.indexOf("POST /login") != -1) {
-            // Обработка данных аутентификации
+            // Autentimise andmete töötlemine
             handleLogin(client, request);
           }
           else if (request.indexOf("GET /logout") != -1) {
-            // Выход из системы
+            // Süsteemist väljumine
             isAuthenticated = false;
             sendAutoRedirect(client);
+          } 
+          else if (request.indexOf("GET /setwifi?") != -1 && isAuthenticated) {
+              // SSID ja salasõna muutmine
+              handleWiFiSettings(client, request);
           }
           else {
-            // Для любых других запросов
+            // Ülejäänud päringute jaoks
             if (isAuthenticated) {
               sendHTMLResponse(client);
             } else {
@@ -108,7 +142,55 @@ void loop() {
   }
 }
 
-// Функция для автоматического перенаправления
+//Kustutame mälust SSID ja salasõna
+void clearPreferences() {
+  prefs.begin("wifi-info", false);
+  prefs.clear();
+  prefs.end();
+}
+
+//Funktsioon Wifi ssid ja salasõna muutmiseks 
+void handleWiFiSettings(WiFiClient &client, String request) {
+  int ssidIndex = request.indexOf("ssid=");
+  int passIndex = request.indexOf("password=");
+
+  if (ssidIndex != -1 && passIndex != -1) {
+    String newSSID = request.substring(ssidIndex + 5, request.indexOf("&", ssidIndex));
+    String newPass = request.substring(passIndex + 9, request.indexOf(" HTTP/1.1", passIndex));
+
+    // Asendame "+" tühikuga (URL jaoks)
+    newSSID.replace("+", " ");
+    newPass.replace("+", " ");
+
+    // Salvestame
+    prefs.begin("wifi-info", false); // write mode
+    prefs.putString("ssid", newSSID);
+    prefs.putString("password", newPass);
+    prefs.end();
+
+    // Vastus kliendile
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("Connection: close");
+    client.println();
+    client.println("<html><body>");
+    client.println("<h2>WiFi credentials are changed</h2>");
+    client.println("<p>New SSID: " + newSSID + "</p>");
+    client.println("<p>Restarting M5Atom Lite...</p>");
+    client.println("</body></html>");
+
+    delay(5000);
+    ESP.restart();  // Taaskäivitame M5Atom
+  } else {
+    client.println("HTTP/1.1 400 Bad Request");
+    client.println("Content-Type: text/html");
+    client.println("Connection: close");
+    client.println();
+    client.println("Not enough new credentials to change WiFi.");
+  }
+}
+
+// Funktsioon automaatskes ümbersuunamiseks
 void sendAutoRedirect(WiFiClient client) {
   client.println("HTTP/1.1 302 Found");
   client.println("Location: /auth");
@@ -116,7 +198,7 @@ void sendAutoRedirect(WiFiClient client) {
   client.println();
 }
 
-// Функция для отправки страницы аутентификации
+// Autentimise lehekülje loomine
 void sendAuthPage(WiFiClient client) {
   client.println("HTTP/1.1 200 OK");
   client.println("Content-type:text/html");
@@ -154,9 +236,9 @@ void sendAuthPage(WiFiClient client) {
   client.println("</html>");
 }
 
-// Функция для обработки логина
+// Logini töötlemise funktsioon
 void handleLogin(WiFiClient client, String request) {
-  // Парсим данные формы
+  // Parsime "form" andmeid
   String username = "";
   String password = "";
   
@@ -170,13 +252,13 @@ void handleLogin(WiFiClient client, String request) {
       username = body.substring(userPos + 9, body.indexOf('&', userPos));
       password = body.substring(passPos + 9);
       
-      // URL decode (простой вариант)
+      // URL decode 
       username.replace("+", " ");
       password.replace("+", " ");
     }
   }
   
-  // Проверяем credentials
+  // Kontrollime credentials
   Serial.println(authPassword +' '+authUsername);
   if (username == authUsername && password == authPassword) {
     isAuthenticated = true;
@@ -234,7 +316,7 @@ void sendHTMLResponse(WiFiClient &client) {
   client.println("<body>");
   client.println("<h1>M5Atom LED Control</h1>");
   
-  // Кнопка выхода
+  // Nupp väljumiseks
   client.println("<div style='float: right;'><a href='/logout'>Logout</a></div>");
   
   String colorHex = getColorHex();
@@ -242,7 +324,7 @@ void sendHTMLResponse(WiFiClient &client) {
   client.print(colorHex);
   client.print("</p>");
   
-  // Правильное экранирование кавычек
+  // Tähtis on jutumärkide õige ekraneerimine(kas õigesti eesti keeles?)
   client.print("<p>");
   client.print("Click <a href=\"/set?value=%23FF0000\">here</a> to turn ON RED the LED.<br>");
   client.print("Click <a href=\"/set?value=%2300FF00\">here</a> to turn on Green the LED.<br>");
@@ -250,14 +332,28 @@ void sendHTMLResponse(WiFiClient &client) {
   client.print("Click <a href=\"/set?value=%23000000\">here</a> to turn OFF the LED.");
   client.print("</p>");
   
-  // Добавляем форму для ручного ввода цвета
+  //Color wheel
   client.print("<form action=\"/set\" method=\"GET\">");
-  client.print("Custom color (RRGBB): #<input type=\"text\" name=\"value\" value=\"");
+  client.print("<input type=\"color\" id=\"value\" name=\"value\" value=\"" + colorHex + "\">");
+  client.print("<input type=\"submit\" value=\"Set Color\">");
+  client.print("</form>");
+
+  // Form, et käsitsi trükkida värvi  
+  client.print("<form action=\"/set\" method=\"GET\">");
+  client.print("Custom color (RRGGBB): #<input type=\"text\" name=\"value\" value=\"");
   client.print(colorHex.substring(1)); // Без #
   client.print("\" maxlength=\"6\" pattern=\"[0-9A-Fa-f]{6}\">");
   client.print("<input type=\"submit\" value=\"Set Color\">");
   client.print("</form>");
   
+  // Form, et muuta credentials
+  client.println("<h1>Change WiFi AP Credentials</h1>");
+  client.println("<form action=\"/setwifi\" method=\"GET\">");
+  client.println("SSID: <input type=\"text\" name=\"ssid\" value=\"" + ssid + "\"><br>");
+  client.println("Password: <input type=\"text\" name=\"password\" value=\"" + password + "\" minlength=\"8\"><br>");
+  client.println("<input type=\"submit\" value=\"Change WiFi Settings\">");
+  client.println("</form>");
+
   client.println("</body>");
   client.println("</html>");
 }
@@ -272,16 +368,16 @@ void handleSetRequest(WiFiClient &client, String request) {
       color = color.substring(0, endIndex);
     }
     
-    // Убираем возможные лишние символы
+    // Kustume võimalikke liigseid sümboleid
     color.trim();
     
-    // Декодируем URL-encoding: %23 -> #
+    // Dekodeerime URL-encoding: %23 -> #
     color.replace("%23", "#");
     
     Serial.print("Decoded color: ");
     Serial.println(color);
     
-    // Если цвет без #, добавляем его
+    // Kui puudub "#", siis lisame seda
     if (color.length() == 6 && color[0] != '#') {
       color = "#" + color;
     }
@@ -325,14 +421,14 @@ void handleSetRequest(WiFiClient &client, String request) {
   }
 }
 
-// Функция для получения текущего цвета в формате HEX
+// Funktsioon praeguse värvi saamiseks HEX formaadis
 String getColorHex() {
   char hexColor[8];
   sprintf(hexColor, "#%02X%02X%02X", currentRed, currentGreen, currentBlue);
   return String(hexColor);
 }
 
-// Функция для установки цвета по HEX-значению
+// Funktsioon värvi määramiseks HEX-väärtuse kaudu
 void setColorFromHex(String hexColor) {
   if (hexColor.length() == 7 && hexColor[0] == '#') {
     String redStr = hexColor.substring(1, 3);
@@ -343,10 +439,10 @@ void setColorFromHex(String hexColor) {
     currentGreen = strtol(greenStr.c_str(), NULL, 16);
     currentBlue = strtol(blueStr.c_str(), NULL, 16);
 
-    // Формируем цвет в 32-битном формате
+    // Loome värvi 32-bit formaadis
     uint32_t color = (currentRed << 16) | (currentGreen << 8) | currentBlue;
 
-    // Устанавливаем цвет на LED
+    // LED värvi kehtestamine
     M5.dis.drawpix(0, color);
   }
 }
