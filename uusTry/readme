@@ -1,26 +1,26 @@
-Viimane ESPAsyncWebServer
+Viimane *ESPAsyncWebServer*
 https://github.com/ESP32Async/ESPAsyncWebServer/releases
 https://github.com/ESP32Async/AsyncTCP/releases
-LittleFS
+*LittleFS*
 https://randomnerdtutorials.com/arduino-ide-2-install-esp32-littlefs/#upload-files
-Probleemid M5Atom peaks ESP32 mitte M5Stacks
-ESPAsyncWebServer.h muutsin
+*Probleemid M5Atom peaks ESP32 mitte M5Stacks*
+*ESPAsyncWebServer.h* muutsin
 seda
- tcp_state state() const {
+' tcp_state state() const {
 #ifdef ESP8266
     // ESPAsyncTCP and RPAsyncTCP methods are not corrected declared with const for immutable ones.
     return static_cast<tcp_state>(const_cast<AsyncWebServer *>(this)->_server.status());
 #else
     return static_cast<tcp_state>(_server.status());
 #endif
-  }
+  }'
 
 sellele
- tcp_state state() {
+' tcp_state state() {
 #ifdef ESP8266
     // ESPAsyncTCP and RPAsyncTCP methods are not corrected declared with const for immutable ones.
     return static_cast<tcp_state>(const_cast<AsyncWebServer *>(this)->_server.status());
 #else
     return static_cast<tcp_state>(_server.status());
 #endif
-  }
+  }'
