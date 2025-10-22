@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wi-Fi — M5Atom</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Change Wi-Fi AP</h1>
+    <a class="btn small" href="/">Back</a>
+  </header>
+
+  <main class="card">
+    <form action="/setwifi" method="POST">
+      <label>SSID</label>
+      <input type="text" name="ssid" required>
+      <label>Password (min 8)</label>
+      <input type="text" name="password" minlength="8" required>
+      <div style="margin-top:10px;">
+        <button class="btn" type="submit">Save & Reboot</button>
+      </div>
+    </form>
+    <p class="small">После сохранения устройство перезагрузится и будет работать с новыми SSID и паролем.</p>
+  </main>
+</body>
+</html>

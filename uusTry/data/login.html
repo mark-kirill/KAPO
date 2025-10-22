@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — M5Atom</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="card auth">
+    <h2>Authentication</h2>
+    <form action="/login" method="POST">
+      <label>Username</label>
+      <input type="text" name="username" value="admin" required>
+      <label>Password</label>
+      <input type="password" name="password" value="1234" required>
+      <div style="margin-top:10px;">
+        <button class="btn" type="submit">Login</button>
+      </div>
+    </form>
+    <p class="small">Default: admin / 1234</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>M5Atom — Управление LED</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>M5Atom LED Control</h1>
+    <a class="btn small" href="/logout">Logout</a>
+  </header>
+
+  <main class="card">
+    <p class="small">Текущий цвет: <span id="currentColor">#000000</span></p>
+
+    <div class="row">
+      <button class="btn" onclick="setColor('#FF0000')">Red</button>
+      <button class="btn" onclick="setColor('#00FF00')">Green</button>
+      <button class="btn" onclick="setColor('#0000FF')">Blue</button>
+      <button class="btn" onclick="setColor('#000000')">Off</button>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label for="picker">Color picker</label>
+      <input id="picker" type="color" value="#000000" onchange="setColor(this.value)">
+    </div>
+
+    <form id="hexForm" onsubmit="submitHex(); return false;">
+      <label for="hexInput">Custom (RRGGBB)</label>
+      <input id="hexInput" type="text" maxlength="6" pattern="[0-9A-Fa-f]{6}" placeholder="ff00aa">
+      <div style="margin-top:8px;">
+        <button class="btn" type="submit">Set</button>
+      </div>
+    </form>
+  </main>
+
+  <footer class="card small">
+    <a href="/wifi.html">Change Wi-Fi AP credentials</a>
+  </footer>
+
+<script src="/script.js"></script>
+</body>
+</html>
