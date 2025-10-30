@@ -1,0 +1,38 @@
+Crypto test on i9-12900KS
+Kiirus: 461 339 klahvi sekundis
+❌ Jõuvõte ebaõnnestus (võti liiga pikk)
+⏱️ Aeg: 32,53 sekundit
+🔢 Katseid: 15 018 570
+
+================================================================================
+📊 TULEMUSTE ANALÜÜS:
+Katsete koguarv: 15 018 570
+Koguaeg: 32,53 sekundit
+Kiirus: 461 618 klahvi sekundis
+
+🎯 VÕTME 'KAPOTeam' SKOOR:
+Võtme pikkus: 8 tähemärki
+Klahviruumi suurus: 62^8 = 218 340 105 584 896
+Täieliku otsingu eeldatav aeg:
+15 AASTAT!
+
+3. 🔬 TÄIUSTATUD KRÜPTOANALYÜS
+========================================================
+Võti: KAPOTeam
+Sõnum: #FF0000:1234567890000
+HMAC-SHA256: 29d4821eba21e72cfa10aa2cab4a7ea5a38ae0f2ccd1073337839c8f80d92e4f
+Pikkus: 256 bitti (256 bitti kuueteistkümnendsüsteemis)
+
+📈 TUGEVUSANALÜÜS:
+Võtme pikkus: 8 tähemärki
+Tähestik: 94 tähemärki
+Võtmevahe: 6 095 689 385 410 816 võimalikku võtit
+See on 2^53 kombinatsiooni
+
+⏱️ RÜNNAKUSAJA HINNANGULINE HINNANGULINE HINNANGULINE HINNANG (1 000 000 räsi/sekundis):
+193,3 aastat
+
+🛡️ JÄRELDUS: Võti 'KAPOTeam' on TURVALINE
+
+==========================================================================================
+🛡️ JÄRELDUS: Süsteem on TURVALINE – võtit pole häkitud!
