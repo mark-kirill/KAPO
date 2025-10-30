@@ -2,58 +2,85 @@ import hmac
 import hashlib
 import requests
 import urllib.parse
+import time
 
-def test_all_possibilities():
-    
-    possible_keys = [
-        "my_secret_key_123",
-        "12345678", 
-        "KAPOTeam",
-        "admin123",
-        "kapo_team",
-        "66666666",
-        "",
-    ]
-    
-    test_message = "FF0000"  
-    
-    for key in possible_keys:
-        print(f"\n--- Testing key: '{key}' ---")
+class SecureLEDClient:
+    def __init__(self, base_url, secret_key):
+        self.base_url = base_url
+        self.secret_key = secret_key
+        self.session = requests.Session()
         
-        # Генерируем подпись
-        if key:
-            signature = hmac.new(
-                key.encode('utf-8'),
-                test_message.encode('utf-8'),
-                hashlib.sha256
-            ).hexdigest()
-        else:
-            signature = "no_key"
-            
-        print(f"Signature: {signature}")
-        
-        # URL encode the value parameter
-        encoded_color = urllib.parse.quote(f"#{test_message}")
-        url = f"http://192.168.1.154/set?value={encoded_color}&signature={signature}"
+    def login(self):
+        login_data = {
+            "username": "admin",
+            "password": "1234"
+        }
         
         try:
-            response = requests.get(url, timeout=5)
-            print(f"Status: {response.status_code}")
-            if response.status_code == 200:
-                print(f"✅ SUCCESS! Key found: '{key}'")
-                return key
-            elif "Invalid signature" in response.text:
-                print("❌ Invalid signature")
+            response = self.session.post(
+                f"{self.base_url}/login",
+                data=login_data,
+                allow_redirects=False  
+            )
+            
+            if response.status_code == 302:  
+                print("✅ Login successful")
+                return True
             else:
-                print(f"Response: {response.text}")
+                print(f"❌ Login failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"Login error: {e}")
+            return False
+    
+    def set_color(self, color_hex):
+        signature = hmac.new(
+            self.secret_key.encode('utf-8'),
+            color_hex.encode('utf-8'),
+            hashlib.sha256
+        ).hexdigest()
+        
+        # URL encode
+        encoded_color = urllib.parse.quote(color_hex)
+        url = f"{self.base_url}/set?value={encoded_color}&signature={signature}"
+        
+        print(f"Setting color: {color_hex}")
+        print(f"Signature: {signature}")
+        
+        try:
+            response = self.session.get(url, timeout=10)
+            print(f"Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                if "Color set to" in response.text:
+                    print("🎉 Color changed successfully!")
+                    time.sleep(0.3)
+                    return True
+                else:
+                    print("⚠ Authenticated but unexpected response")
+                    return False
+            else:
+                print(f"❌ Failed: {response.text[:100]}...")
+                return False
+                
         except Exception as e:
             print(f"Error: {e}")
+            return False
+
+if __name__ == "__main__":
+    client = SecureLEDClient("http://192.168.1.154", "KAPOTeam")
     
-    return None
-
-
-found_key = test_all_possibilities()
-if found_key:
-    print(f"\n🎉 Found the key: '{found_key}'")
-else:
-    print("\n🔴 Key not found in common defaults")
+    if client.login():
+        colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFFFF", "#FFA500"]
+        
+        for color in colors:
+            success = client.set_color(color)
+            
+            if success:
+                print(f"✅ {color} - OK")
+            else:
+                print(f"❌ {color} - Failed")
+            print("---")
+    else:
+        print("❌ Cannot proceed without authentication")
