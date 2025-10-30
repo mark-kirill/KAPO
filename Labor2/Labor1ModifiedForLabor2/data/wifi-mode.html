@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WiFi Mode — M5Atom</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>WiFi Mode Control</h1>
+    <a class="btn small" href="/">Back</a>
+  </header>
+
+  <main class="card">
+    <div id="wifiInfo" class="small"></div>
+    
+    <div style="margin-top: 16px;">
+      <button class="btn" onclick="switchMode('ap')">Switch to AP Mode</button>
+      <button class="btn" onclick="switchMode('client')">Switch to Client Mode</button>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <h3>WiFi Client Settings</h3>
+      <form action="/setwifi" method="POST">
+        <label>SSID</label>
+        <input type="text" name="ssid" required>
+        <label>Password (min 8)</label>
+        <input type="text" name="password" minlength="8" required>
+        <div style="margin-top:10px;">
+          <button class="btn" type="submit">Save WiFi Credentials</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Update WiFi info
+    function updateWifiInfo() {
+      fetch('/status').then(r => r.json()).then(data => {
+        const infoEl = document.getElementById('wifiInfo');
+        infoEl.innerHTML = `
+          <strong>Current Mode:</strong> ${data.wifi_mode.toUpperCase()}<br>
+          <strong>IP Address:</strong> ${data.ip}<br>
+          <strong>Crypto:</strong> ${data.crypto_enabled ? 'ENABLED' : 'DISABLED'}
+        `;
+      });
+    }
+
+    // Switch WiFi mode
+    function switchMode(mode) {
+      fetch('/switchmode', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'mode=' + mode
+      }).then(r => r.text()).then(result => {
+        alert(result);
+        setTimeout(updateWifiInfo, 2000);
+      }).catch(err => {
+        alert('Error: ' + err);
+      });
+    }
+
+    // Initial load
+    updateWifiInfo();
+  </script>
+</body>
+</html>

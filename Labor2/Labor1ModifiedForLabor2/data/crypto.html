@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crypto Key — M5Atom</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Set Crypto Key</h1>
+    <a class="btn small" href="/">Back</a>
+  </header>
+
+  <main class="card">
+    <div id="cryptoStatus" class="small"></div>
+    
+    <form id="cryptoForm">
+      <label>Crypto Key (min 8 characters)</label>
+      <input type="text" id="cryptoKey" name="key" minlength="8" required>
+      <div style="margin-top:10px;">
+        <button class="btn" type="submit">Set Key</button>
+      </div>
+    </form>
+    
+    <p class="small" style="margin-top: 20px;">
+      <strong>Important:</strong> Key can only be set in AP mode. After setting, this page will be blocked.
+    </p>
+  </main>
+
+  <script>
+    // Check current status
+    fetch('/status').then(r => r.json()).then(data => {
+      const statusEl = document.getElementById('cryptoStatus');
+      
+      if (data.crypto_enabled) {
+        statusEl.innerHTML = '<span style="color:green">✓ Crypto key is SET</span>';
+        document.getElementById('cryptoForm').style.display = 'none';
+      } else if (data.wifi_mode === 'client') {
+        statusEl.innerHTML = '<span style="color:orange">⚠ Switch to AP mode to set key</span>';
+        document.getElementById('cryptoForm').style.display = 'none';
+      } else {
+        statusEl.innerHTML = '<span style="color:blue">ℹ Crypto key not set</span>';
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('cryptoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const key = document.getElementById('cryptoKey').value;
+      
+      fetch('/setcryptokey', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'key=' + encodeURIComponent(key)
+      }).then(r => r.text()).then(result => {
+        alert(result);
+        if (result.includes('successfully')) {
+          location.reload();
+        }
+      }).catch(err => {
+        alert('Error: ' + err);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -31,6 +31,22 @@ function refreshStatus() {
     console.log('status error', err);
   });
 }
+function setColorWithSignature(hex) {
+  fetch('/status').then(r => r.json()).then(data => {
+    if (data.wifi_mode === 'client' && data.crypto_enabled) {
+      alert('In client mode with crypto: use Python script for signed commands');
+      return;
+    }
+    
+    // Standard request for AP mode or no crypto
+    const encoded = encodeURIComponent(hex);
+    fetch('/set?value=' + encoded).then(resp => {
+      document.getElementById('currentColor').textContent = hex;
+      const picker = document.getElementById('picker');
+      if (picker) picker.value = hex;
+    }).catch(err => console.log('set error', err));
+  });
+}
 
 document.addEventListener('DOMContentLoaded', function(){
   refreshStatus();
