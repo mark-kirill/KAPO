@@ -48,6 +48,30 @@ Mitme kihiga kaitstud süsteemid
 Võtmekombinatsioone tuleb arvestada koos ajatempli ja vorminguga
 
 Päriselt turvaline iga-päeva kasutajatele
+REAALNE JÕUDLUS ANDMETEL:
+HMAC-SHA256 RTX 4080-l:
+
+Testide põhjal: ~2-3 miljardit räsist/sekundis (mitte 15 miljardit)
+
+Allikas: hashcat testid RTX 4090-l näitavad ~3.2 miljardit/sek
+
+XOR operatsioonid CPU-l (i9-12900KS):
+
+~200-500 miljonit operatsiooni/sekundis (mitte miljardid)
+
+Probleemid: mälu kitsaskoht ja Pythoni üldkulud
+
+UUENDATUD ARVUTUSED:
+XOR (8 märki):
+
+text
+218 triljonit / 300 miljonit sekundis = 727,000 sekundit
+= 8.4 päeva
+HMAC-SHA256 (8 märki):
+
+text
+218 triljonit / 2.5 miljardit sekundis = 87,200 sekundit  
+= 1.0 päev
 REAALSED OHUD:
 Korraldatud rühmad GPU-fermidega (10-100 graafikakaarti):
 
