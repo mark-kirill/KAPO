@@ -93,27 +93,7 @@ SOOVITUSED | OPTIMAALNE TURVALISUS
 • Lisa ERIMÄRKE ja SUURI TÄHTI suurema turvalisuse jaoks
 
 
-🚀  GPU VERSIOONI KÄIVITUS XOR PAROOL
 
-🎯 TÕELINE GPU BRUTE FORCE KÄIVITATUD...
-Märke: 62, Kombinatsioone: 14,776,336
-Otsime: '1234'
-🔄 Paroolide genereerimine GPU-l...
-✅ Generatsioon lõpetatud. Näited:
-[0] 0000
-[1] 0001
-[2] 0002
-[3] 0003
-[4] 0004
-🎯 Sihtväärtus: '1234' -> 825373492 (hex: 0x31323334)
-🔍 Vastete otsimine GPU-l...
-✅ PAROOL LEITUD: '1234'
-Indeks: 246206
-Koguaeg: 0,621 s
-Puhas GPU aeg: 0,151 s
-Kiirus: 23,813,199 komb/s
-GPU kiirus: 97,901,652 komb/s
-🔍 Kontroll: passwords_gpu[246206] == 825373492
 Taastatud: '1234'
 
 🎉 ÕNNESTUS! Leiti parool: 1234
