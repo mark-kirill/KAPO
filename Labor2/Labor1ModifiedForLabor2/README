@@ -1,74 +1,59 @@
+TEHNILISED ARVUTUSED:
+8-märgilise võtme turvalisus:
 
-🚀 KÄIVITAME ÜLIMAT GPU TESTI
-💻 i9-12900KS + 🎮 RTX 4080
-🎯 8-tähemärgiline intelligentne rünnak
-=========================================================================
-💀 ÜLIM TEST: TÕELINE GPU KIIRENDUS
-====================================================================================================
-🚀 REŽIIM AKTIVEERITUD TÕELINE GPU KIIRENDUS
-💻 PROTSESSORI: i9-12900KS (16 lõime)
-🎮 GPU: RTX 4080 🚀
-⏱️ Ajapiirang: 60 sekundit
-🎯 Eesmärk: 8 TÄHELE Nutika otsinguga
+XOR (teoreetiline):
 
-📊 TÕELISE GPU VERSIOONITÕSTUSE KÄIVITAMINE...
-🚀 GPU kiirus: 559 429 võtit sekundis (partii suurus: 100 000)
+218 triljonit kombinatsiooni
 
-🎯 NUPUKA GPU RÜNNAK KÄIVITAMINE
-============================================================================
-🔍 1. faas: Kohene sagedane klahvide kontroll...
-🔍 2. faas: Intelligentne jõhker jõud 1-8 tähemärki...
+i9-12900KS + RTX 4080: ~300 miljonit operatsiooni/sek
 
-🎯 Kontrollitakse pikkust 1...
-🧠 Pikkus 1: 62 kombinatsiooni
+Aeg: 8.4 päeva (puhas arvutus ilma kaitseteta)
 
-🎯 Kontrollitakse pikkust 2...
+HMAC-SHA256 (teoreetiline):
 
-🧠 Pikkus 2: 3844 kombinatsiooni
+218 triljonit kombinatsiooni
 
-🎯 Kontrollitakse pikkust 3...
+RTX 4080: ~2.5 miljardit räsist/sek
 
-🧠 Pikkus 3: 238 328 kombinatsiooni
-⚡ 487 208/sek | 📊 1 003 918 | ⏳ 58s
+Aeg: 1.0 päev (puhas krüptograafia ilma kaitseteta)
 
-🎯 Pikkuse 4 kontrollimine...
-🧠 Pikkus 4: 14 776 336 kombinatsiooni
-⚡ 447 940/sek | 📊 2 442 246 | ⏳55s
-⚡ 473,397/sek | 📊 4 242 246 | ⏳51s
-⚡ 477,380/sek | 📊 5 842 246 | ⏳ 48s
-⚡ 481,535/sek | 📊 7 342 246 | ⏳ 45s
-⚡ 487,831/sek | 📊 8 942 246 | ⏳ 42s
-⚡ 502,632/sek | 📊 10 742 246 | ⏳ 39s
-⚡ 502,043/sek | 📊 12 242 246 | ⏳ 36s
-⚡ 504 741/sek | 📊 13 842 246 | ⏳ 33s
-⚡ 513 878/sek | 📊 15 642 246 | ⏳ 30s
+REAALSES MAailMAS:
+Kaitstud süsteem (M5Atom):
 
-🎯 Pikkuse 5 kontrollimine...
-🧠 Pikkus 5: 916 132 832 kombinatsiooni
-📊 Näidis: 916 132 võtit (0,1000%)
-⚡ 503 078/sek | 📊 16 834 714 | ⏳ 27s
+cpp
+// Mitmetasandiline kaitse:
+1. Ajatempli kontroll (5-30 sekundi aken)
+2. Päringute piiramine (10-100 päringut/sek)
+3. Käsu vormingu kontroll
+4. Allkirja verifitseerimine
+Reaalne rünnaku aeg kaitstud süsteemile:
 
-🎯 Pikkuse 6 kontrollimine...
-🧠 Pikkus 6: 56 800 235 584 kombinatsiooni
-📊 Näidis: 5 000 000 võtit (0,0088%)
-⚡ 439 549/s | 📊 21 434 714 | ⏳ 11s
+252 päeva (ideaalsetes tingimustes)
 
-🎯 Pikkuse 7 kontrollimine...
-🧠 Pikkus 7: 3 521 614 606 208 kombinatsiooni
-🎯 Nutikas näidis: 2 000 000 võtit (0,000057%)
-⚡ 404 577/s | 📊 21 934 714 | ⏳ 6s
-⚡ 414,585/s | 📊 23 734 714 | ⏳ 3s
+Praktikas: võimatu seadme blokeerimise tõttu
 
-🎯 Kontrollitakse 8 pikkust...
-🧠 8 pikkus: 218 340 105 584 896 kombinatsiooni
-🎯 Nutikas valim: 2 000 000 võtit (0,000001%)
+OLULISED VAHED:
+Teoreetiline oht:
 
-📊 RÜNNAKUTULEMUSED:
-Aeg: 64,1 s
-Katseid: 25 534 714
-Kiirus: 398 389 võtit sekundis
-Tipp: 559 429 võtit sekundis
-🛡️ Võtit ei leitud
+Puhas HMAC ilma lisakaitseteta
 
-⚡ LÕPPKIIRUS: 398 389 võtit sekundis
-🎯 JÄRELDUS: Kaasaegsed GPU-d ei suuda ikka veel 8-tähemärgilisi võtmeid mõistliku aja jooksul murda!
+GPU-dega võimalik murda ~1 päevaga
+
+EI ESINE päriselus
+
+Praktiline turvalisus:
+
+Mitme kihiga kaitstud süsteemid
+
+Võtmekombinatsioone tuleb arvestada koos ajatempli ja vorminguga
+
+Päriselt turvaline iga-päeva kasutajatele
+
+SOOVITUSED 2024:
+8 märki: Piisav IoT-seadmetele kaitstud süsteemis
+
+12+ märki: Soovitatav kriitilistele kontodele
+
+Alati lisada: Ajatemplid ja päringute piiramine
+
+Lõppkokkuvõte: Kuigi matemaatiliselt on 8-märgilised võtmed murdavad, on reaalsed kaitsesüsteemid teinud need praktikas turvaliseks tavalistele rünnakutele. Ohud tekivad vaid siis, kui süsteemid on valesti implementeeritud.
