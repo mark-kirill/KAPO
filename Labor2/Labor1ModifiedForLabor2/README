@@ -48,12 +48,40 @@ Mitme kihiga kaitstud süsteemid
 Võtmekombinatsioone tuleb arvestada koos ajatempli ja vorminguga
 
 Päriselt turvaline iga-päeva kasutajatele
+REAALSED OHUD:
+Korraldatud rühmad GPU-fermidega (10-100 graafikakaarti):
 
-SOOVITUSED 2024:
-8 märki: Piisav IoT-seadmetele kaitstud süsteemis
+Võivad murda 8-märgilisi võtmeid tundidega
 
-12+ märki: Soovitatav kriitilistele kontodele
+Riigitaseme rünnakud ASIC/FPGA seadmetega:
 
-Alati lisada: Ajatemplid ja päringute piiramine
+100-1000 korda kiiremad kui tavatarbijate seadmed
 
-Lõppkokkuvõte: Kuigi matemaatiliselt on 8-märgilised võtmed murdavad, on reaalsed kaitsesüsteemid teinud need praktikas turvaliseks tavalistele rünnakutele. Ohud tekivad vaid siis, kui süsteemid on valesti implementeeritud.
+Aitavad murda isegi pikemaid võtmeid
+
+Statistilised nõrkused:
+
+Enamus paroole sisaldavad mustreid (sünniaeg, lemmiksõnad)
+
+Vähendab murdmise aega 10-100 korda
+
+Ründajad alustavad kõige tõenäolisematest kombinatsioonidest
+
+PRAKTILISED JÄRELDUSED:
+Teoreetiline oht on reaalne:
+
+8-märgilised võtmed on haavatavad sihipäraste rünnakute ees
+
+Tehnoloogia areng muudab rünnakud aina kiiremaks
+
+Kuidas end kaitsta:
+
+Kasuta 12+ märki kriitilistel kontodel
+
+Lisa suuri tähti, numbreid ja sümboleid
+
+Välti isiklikku informatsiooni paroolides
+
+Kasuta paroolihaldurit erinevate paroolide jaoks
+
+Oluline: Kuigi 8-märgilised võtmed on teoreetiliselt murdavad, teevad reaalsed kaitsesüsteemid (ajatimpid, päringute piiramine) need ikkagi praktikas piisavalt turvaliseks enamikule igapäevastest kasutusviisidest.
