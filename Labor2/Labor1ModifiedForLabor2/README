@@ -1,21 +1,4 @@
 TEHNILISED ARVUTUSED:
-8-märgilise võtme turvalisus:
-
-XOR (teoreetiline):
-
-218 triljonit kombinatsiooni
-
-i9-12900KS + RTX 4080: ~300 miljonit operatsiooni/sek
-
-Aeg: 8.4 päeva (puhas arvutus ilma kaitseteta)
-
-HMAC-SHA256 (teoreetiline):
-
-218 triljonit kombinatsiooni
-
-RTX 4080: ~2.5 miljardit räsist/sek
-
-Aeg: 1.0 päev (puhas krüptograafia ilma kaitseteta)
 
 REAALSES MAailMAS:
 Kaitstud süsteem (M5Atom):
