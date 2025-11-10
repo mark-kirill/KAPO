@@ -92,4 +92,19 @@ SOOVITUSED | OPTIMAALNE TURVALISUS
 • 12+ märgi pikkused on ELUOLULISED praktiliseks turvalisuseks
 • Lisa ERIMÄRKE ja SUURI TÄHTI suurema turvalisuse jaoks
 
+🚀 CPU/GPU HMAC-SHA256 BRUTE-FORCE KÄIVITUS
 
+🎯 CPU/GPU HMAC-SHA256 BRUTE-FORCE...
+🔤 Märkide komplekt: 62 märki (TEST)
+📏 Parooli pikkus: 8
+📈 Kokku kombinatsioone: 218 340 105 584 896
+🎯 Otsitav parool: 'KAPOTeam'
+💬 Sõnumile: '#FF0000'
+🔐 Siht-HMACi arvutamine...
+🎯 Siht-HMAC: 1a2ffdbf99949896a67c256f2e1c8c76cb9aaa31d08e4a4e56fae1a5c3dc64aa
+
+🔄 Pakk 1: indeksid 0–1 000 000
+... kontrollitud 10 000/1 000 000 (1.0%) — 390 HMAC/s
+... kontrollitud 20 000/1 000 000 (2.0%) — 428 HMAC/s
+... kontrollitud 30 000/1 000 000 (3.0%) — 414 HMAC/s
+... kontrollitud 40 000/1 000 000 (4.0%) — 427 HMAC/s
