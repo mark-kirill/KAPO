@@ -108,3 +108,135 @@ SOOVITUSED | OPTIMAALNE TURVALISUS
 ... kontrollitud 20 000/1 000 000 (2.0%) — 428 HMAC/s
 ... kontrollitud 30 000/1 000 000 (3.0%) — 414 HMAC/s
 ... kontrollitud 40 000/1 000 000 (4.0%) — 427 HMAC/s
+
+🚀 GPU HMAC-SHA256 BRUTE-FORCE KÄIVITUS
+
+🎯 GPU HMAC-SHA256 BRUTE-FORCE (VEKTORISEERITUD)...
+🔤 Märkide komplekt: 62 märki
+📏 Parooli pikkus: 8
+📈 Kokku kombinatsioone: 218 340 105 584 896
+🎯 Otsitav parool: 'KAPOTeam'
+💬 Sõnumile: '#FF0000'
+🔐 Siht-HMACi arvutamine...
+🎯 Siht-HMAC: 1a2ffdbf99949896a67c256f2e1c8c76cb9aaa31d08e4a4e56fae1a5c3dc64aa
+
+🔄 Pakk 1: 0–10 000
+🔄 HMACi arvutamine GPU-l...
+🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
+🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
+🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: inner_hashes shape=(10000, 8)
+🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
+🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: outer_hashes shape=(10000, 8)
+🔍 DEBUG: hmac_results shape=(10000, 32)
+Pakk lõpetatud: 9961 HMAC/s
+Edenemine: 0.0000%
+
+🔄 Pakk 2: 10 000–20 000
+🔄 HMACi arvutamine GPU-l...
+🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
+🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
+🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: inner_hashes shape=(10000, 8)
+🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
+🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: outer_hashes shape=(10000, 8)
+🔍 DEBUG: hmac_results shape=(10000, 32)
+Pakk lõpetatud: 151207 HMAC/s
+Edenemine: 0.0000%
+
+🔄 Pakk 3: 20 000–30 000
+🔄 HMACi arvutamine GPU-l...
+🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
+🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
+🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: inner_hashes shape=(10000, 8)
+🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
+🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: outer_hashes shape=(10000, 8)
+🔍 DEBUG: hmac_results shape=(10000, 32)
+Pakk lõpetatud: 150527 HMAC/s
+Edenemine: 0.0000%
+
+🔄 Pakk 4: 30 000–40 000
+🔄 HMACi arvutamine GPU-l...
+🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
+🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
+🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: inner_hashes shape=(10000, 8)
+🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
+🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: outer_hashes shape=(10000, 8)
+🔍 DEBUG: hmac_results shape=(10000, 32)
+Pakk lõpetatud: 150408 HMAC/s
+Edenemine: 0.0000%
+
+🔄 Pakk 5: 40 000–50 000
+🔄 HMACi arvutamine GPU-l...
+🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
+🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
+🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: inner_hashes shape=(10000, 8)
+🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
+🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: outer_hashes shape=(10000, 8)
+🔍 DEBUG: hmac_results shape=(10000, 32)
+Pakk lõpetatud: 149536 HMAC/s
+Edenemine: 0.0000%
+
+🔄 Pakk 6: 50 000–60 000
+🔄 HMACi arvutamine GPU-l...
+🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
+🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
+🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: inner_hashes shape=(10000, 8)
+🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
+🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: outer_hashes shape=(10000, 8)
+🔍 DEBUG: hmac_results shape=(10000, 32)
+Pakk lõpetatud: 150881 HMAC/s
+Edenemine: 0.0000%
+
+🔄 Pakk 7: 60 000–70 000
+🔄 HMACi arvutamine GPU-l...
+🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
+🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
+🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: inner_hashes shape=(10000, 8)
+🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
+🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: outer_hashes shape=(10000, 8)
+🔍 DEBUG: hmac_results shape=(10000, 32)
+Pakk lõpetatud: 149210 HMAC/s
+Edenemine: 0.0000%
+
+🔄 Pakk 8: 70 000–80 000
+🔄 HMACi arvutamine GPU-l...
+🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
+🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
+🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: inner_hashes shape=(10000, 8)
+🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
+🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
+🔍 DEBUG: SHA256 batch_size=10000
+🔍 DEBUG: outer_hashes shape=(10000, 8)
+🔍 DEBUG: hmac_results shape=(10000, 32)
+Pakk lõpetatud: 149712 HMAC/s
+Edenemine: 0.0000%
+
