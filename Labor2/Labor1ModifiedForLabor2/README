@@ -150,93 +150,108 @@ Edenemine: 0.0000%
 Pakk lõpetatud: 151207 HMAC/s
 Edenemine: 0.0000%
 
-🔄 Pakk 3: 20 000–30 000
-🔄 HMACi arvutamine GPU-l...
-🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
-🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
-🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: inner_hashes shape=(10000, 8)
-🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
-🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: outer_hashes shape=(10000, 8)
-🔍 DEBUG: hmac_results shape=(10000, 32)
-Pakk lõpetatud: 150527 HMAC/s
-Edenemine: 0.0000%
 
-🔄 Pakk 4: 30 000–40 000
-🔄 HMACi arvutamine GPU-l...
-🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
-🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
-🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: inner_hashes shape=(10000, 8)
-🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
-🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: outer_hashes shape=(10000, 8)
-🔍 DEBUG: hmac_results shape=(10000, 32)
-Pakk lõpetatud: 150408 HMAC/s
-Edenemine: 0.0000%
 
-🔄 Pakk 5: 40 000–50 000
-🔄 HMACi arvutamine GPU-l...
-🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
-🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
-🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: inner_hashes shape=(10000, 8)
-🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
-🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: outer_hashes shape=(10000, 8)
-🔍 DEBUG: hmac_results shape=(10000, 32)
-Pakk lõpetatud: 149536 HMAC/s
-Edenemine: 0.0000%
 
-🔄 Pakk 6: 50 000–60 000
-🔄 HMACi arvutamine GPU-l...
-🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
-🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
-🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: inner_hashes shape=(10000, 8)
-🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
-🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: outer_hashes shape=(10000, 8)
-🔍 DEBUG: hmac_results shape=(10000, 32)
-Pakk lõpetatud: 150881 HMAC/s
-Edenemine: 0.0000%
 
-🔄 Pakk 7: 60 000–70 000
-🔄 HMACi arvutamine GPU-l...
-🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
-🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
-🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: inner_hashes shape=(10000, 8)
-🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
-🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: outer_hashes shape=(10000, 8)
-🔍 DEBUG: hmac_results shape=(10000, 32)
-Pakk lõpetatud: 149210 HMAC/s
-Edenemine: 0.0000%
+🚀 INTERAKTIIVNE REŽIIM XOR BRUTE FORCE
+============================================================
+Sisestage otsitav sõna (8 märki): KAPOTeam
+Sisestage XOR-võti (vormingus 0x13 või lihtsalt 19): 25
 
-🔄 Pakk 8: 70 000–80 000
-🔄 HMACi arvutamine GPU-l...
-🔍 DEBUG: batch_size=10000, key_bytes=(8,), message=(7,)
-🔍 DEBUG: key_ipad=(64,), key_opad=(64,)
-🔍 DEBUG: inner_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: inner_hashes shape=(10000, 8)
-🔍 DEBUG: inner_hash_bytes_batch shape=(10000, 32)
-🔍 DEBUG: outer_blocks ready, shape=(10000, 64)
-🔍 DEBUG: SHA256 batch_size=10000
-🔍 DEBUG: outer_hashes shape=(10000, 8)
-🔍 DEBUG: hmac_results shape=(10000, 32)
-Pakk lõpetatud: 149712 HMAC/s
-Edenemine: 0.0000%
+🔐 KRÜPTIMISE TULEMUS:
+   Algne sõna: KAPOTeam
+   XOR-võti: 0x19
+   Krüpteeritud string (hex): 525849564d7c7874
 
+🔍 MIS ON TEADA MURDMISEKS?
+1. Võti ja kogu krüptogramm on teada
+2. Ainult krüptogramm on teada (võti teadmata)
+3. Krüptogramm ja osa paroolist on teada
+Valige variant (1–3): 3
+
+🎯 VARIANT 3: Krüptogramm 525849564d7c7874 ja osa paroolist on teada
+Sisestage tuntud märgi positsioon (0–7) või 'done': 4
+Sisestage märk positsioonil 4: T
+✅ Märk 'T' lisatud positsioonile 4
+Sisestage tuntud märgi positsioon (0–7) või 'done': done
+Kas võti on teada? (y/n): n
+🔑 VÕTI ARVUTATAKSE TEATUD MÄRKIDE ALUSEL...
+🔍 Võtme arvutus: cipher[4](0x4d) ^ 'T'(0x54) = 0x19
+✅ Võti leitud: 0x19
+✅ Dekrüpteeritud tekst: KAPOTeam
+
+🎉 EDU! Parool edukalt murdud: KAPOTeam
+🔑 Kasutatud võti: 0x19
+
+🚀 INTERAKTIIVNE REŽIIM XOR BRUTE FORCE
+============================================================
+Sisestage otsitav sõna (8 märki): KAPOTeam
+Sisestage XOR-võti (vormingus 0x13 või lihtsalt 19): 33
+
+🔐 KRÜPTIMISE TULEMUS:
+   Algne sõna: KAPOTeam
+   XOR-võti: 0x21
+   Krüpteeritud string (hex): 6a60716e7544404c
+
+🔍 MIS ON TEADA MURDMISEKS?
+1. Võti ja kogu krüptogramm on teada
+2. Ainult krüptogramm on teada (võti teadmata)
+3. Krüptogramm ja osa paroolist on teada
+Valige variant (1–3): 2
+
+🎯 VARIANT 2: Tuntud ainult krüptogramm 6a60716e7544404c (võti teadmata)
+🔑 VÕTME OTSIMINE TUNTUD MÄRKIDE ALUSEL...
+   Võimalik võti 0xb: 'akze~OKG'
+   Võimalik võti 0x8: 'bhyf}LHD'
+   Võimalik võti 0x9: 'cixg|MIE'
+   Võimalik võti 0xf: 'eo~azKOC'
+   Võimalik võti 0xc: 'fl}byHL@'
+   Võimalik võti 0xd: 'gm|cxIMA'
+   Võimalik võti 0x2: 'hbslwFBN'
+   Võimalik võti 0x3: 'icrmvGCO'
+   Võimalik võti 0x0: 'j`qnuD@L'
+   Võimalik võti 0x1: 'kapotEAM'
+   Võimalik võti 0x6: 'lfwhsBFJ'
+   Võimalik võti 0x7: 'mgvirCGK'
+   Võimalik võti 0x4: 'ndujq@DH'
+   Võimalik võti 0x5: 'oetkpAEI'
+   Võimalik võti 0x1a: 'pzkto^ZV'
+   Võimalik võti 0x1b: 'q{jun_[W'
+   Võimalik võti 0x18: 'rxivm\XT'
+   Võimalik võti 0x19: 'syhwl]YU'
+   Võimalik võti 0x1e: 't~opkZ^R'
+   Võimalik võti 0x1c: 'v|mriX\P'
+   Võimalik võti 0x1d: 'w}lshY]Q'
+   Võimalik võti 0x12: 'xrc|gVR^'
+   Võimalik võti 0x13: 'ysb}fWS_'
+   Võimalik võti 0x10: 'zpa~eTP\''
+   Võimalik võti 0x2b: 'AKZE^okg'
+   Võimalik võti 0x28: 'BHYF]lhd'
+   Võimalik võti 0x29: 'CIXG\mie'
+   Võimalik võti 0x2e: 'DN_@[jnb'
+   Võimalik võti 0x2f: 'EO^AZkoc'
+   Võimalik võti 0x2c: 'FL]BYhl`'
+   Võimalik võti 0x2d: 'GM\CXima'
+   Võimalik võti 0x22: 'HBSLWfbn'
+   Võimalik võti 0x23: 'ICRMVgco'
+   Võimalik võti 0x20: 'J@QNUd`l'
+   Võimalik võti 0x21: 'KAPOTeam'
+   Võimalik võti 0x26: 'LFWHSbfj'
+   Võimalik võti 0x27: 'MGVIRcgk'
+   Võimalik võti 0x24: 'NDUJQ`dh'
+   Võimalik võti 0x25: 'OETKPaei'
+   Võimalik võti 0x3a: 'PZKTO~zv'
+   Võimalik võti 0x38: 'RXIVM|xt'
+   Võimalik võti 0x39: 'SYHWL}yu'
+   Võimalik võti 0x3e: 'T^OPKz~r'
+   Võimalik võti 0x3c: 'V\MRIx|p'
+   Võimalik võti 0x3d: 'W]LSHy}q'
+   Võimalik võti 0x32: 'XRC\Gvr~'
+   Võimalik võti 0x30: 'ZPA^Etp|'
+
+🎯 Leiti 47 võimalikku lahendust
+⚠️ Mitmeid võimalikke lahendusi, vaja täiendavat teavet
+
+🎉 EDU! Parool edukalt murdud: KAPOTeam
+🔑 Kasutatud võti: 0x21
