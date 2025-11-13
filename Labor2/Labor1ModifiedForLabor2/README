@@ -253,5 +253,33 @@ Valige variant (1–3): 2
 🎯 Leiti 47 võimalikku lahendust
 ⚠️ Mitmeid võimalikke lahendusi, vaja täiendavat teavet
 
+
+🚀 TÄIELIK GPU-VEKTORISEERITUD RÜNNAK
+
+🎯 TÄIELIK GPU-VEKTORISEERITUD RÜNNAK
+🔤 Tuntud osa: 'KAPOT'
+🔤 Tundmatud sümbolid: 3
+📈 Kombinatsioone: 238,328
+🎯 Siht HMAC: 1a2ffdbf99949896a67c256f2e1c8c76cb9aaa31d08e4a4e56fae1a5c3dc64aa
+🔄 Töötleme kõiki kombinatsioone ühe partiiga...
+🔍 Arvutame HMAC-i 238,328 parooli jaoks...
+🎯 Sihtparool leitud positsioonil 15388
+✅ PAROOL LEITUD: 'KAPOTeam' — 14,17 sekundiga
+⚡ Kiirus: 16,814 HMAC/s
+
+🎉 EDU! Leiti parool: KAPOTeam
+
+🔄 Katsetame 4 tuntud sümboliga...
+🎯 TÄIELIK GPU-VEKTORISEERITUD RÜNNAK
+🔤 Tuntud osa: 'KAPO'
+🔤 Tundmatud sümbolid: 4
+📈 Kombinatsioone: 14,776,336
+🎯 Siht HMAC: 1a2ffdbf99949896a67c256f2e1c8c76cb9aaa31d08e4a4e56fae1a5c3dc64aa
+🔍 Kasutame partiide kaupa versiooni...
+🔍 Partii 1: 0–50,000
+🔍 Partii 2: 50,000–100,000
+🔍 Partii 3: 100,000–150,000
+🔍 Partii 4: 150,000–200,000
+
 🎉 EDU! Parool edukalt murdud: KAPOTeam
 🔑 Kasutatud võti: 0x21
