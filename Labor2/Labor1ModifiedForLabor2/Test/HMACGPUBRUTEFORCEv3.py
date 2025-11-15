@@ -462,35 +462,230 @@ def compute_hmac_sha256_gpu(message_bytes, key_bytes):
     
     return hmac_result
 
+def full_bruteforce_letters_only(target_hmac_hex, target_message="#FF0000", password_length=8):
+    """ПОЛНЫЙ БРУТФОРС для ключа из 8 букв (A-Z, a-z)"""
+    print("🎯 FULL BRUTEFORCE - LETTERS ONLY (A-Z, a-z)")
+    
+    # Только буквы! 26 + 26 = 52 символа
+    all_chars = string.ascii_letters  # A-Za-z
+    total_combinations = len(all_chars) ** password_length
+    
+    print(f"🔤 Набор символов: {len(all_chars)} символов (A-Z, a-z)")
+    print(f"📏 Длина ключа: {password_length}")
+    print(f"📈 Всего комбинаций: {total_combinations:,}")
+    print(f"💬 Известное сообщение: '{target_message}'")
+    print(f"🎯 Целевой HMAC: {target_hmac_hex}")
+    
+    # Подготовка целевых данных
+    target_message_bytes = cp.array([ord(c) for c in target_message], dtype=cp.uint8)
+    target_hmac = cp.array([int(target_hmac_hex[i:i+2], 16) for i in range(0, 64, 2)], dtype=cp.uint8)
+    
+    # Автоматический расчет батча
+    try:
+        mem_info = cp.cuda.runtime.memGetInfo()
+        available_memory = mem_info[0] * 0.6  # 60% свободной памяти
+        batch_size = min(int(available_memory // (password_length * 2)), 5_000_000)
+        batch_size = max(batch_size, 100_000)
+    except:
+        batch_size = 500_000
+    
+    print(f"📊 Размер батча: {batch_size:,}")
+    
+    start_time = time.time()
+    ascii_codes = cp.array([ord(c) for c in all_chars], dtype=cp.uint32)
+    num_chars = len(all_chars)
+    
+    found_password = None
+    total_tested = 0
+    total_hmacs = 0
+    
+    print(f"🔄 Начинаем полный перебор...")
+    
+    for batch_start in range(0, total_combinations, batch_size):
+        if found_password:
+            break
+            
+        batch_end = min(batch_start + batch_size, total_combinations)
+        current_batch_size = batch_end - batch_start
+        
+        # Прогресс каждые N батчей
+        if (batch_start // batch_size) % 10 == 0:
+            elapsed = time.time() - start_time
+            progress = (batch_start / total_combinations) * 100
+            if elapsed > 0:
+                speed = total_tested / elapsed
+                eta = (total_combinations - batch_start) / speed if speed > 0 else 0
+                print(f"🔍 Прогресс: {progress:.4f}% | Проверено: {total_tested:,} | "
+                      f"Скорость: {speed:,.0f} HMAC/сек | ETA: {eta/3600:.1f} часов")
+        
+        # Генерация паролей на GPU
+        indices = cp.arange(batch_start, batch_end, dtype=cp.uint64)
+        
+        # Оптимизированная генерация символов
+        chars = []
+        for i in range(password_length):
+            power = num_chars ** (password_length - 1 - i)
+            chars.append(ascii_codes[(indices // power) % num_chars])
+        
+        # Собираем пароли
+        passwords_batch = cp.stack(chars, axis=1).astype(cp.uint8)
+        
+        # Векторизованный HMAC
+        batch_start_time = time.time()
+        hmac_results = compute_hmac_sha256_gpu_batch_optimized(passwords_batch, target_message_bytes)
+        batch_time = time.time() - batch_start_time
+        
+        # Поиск совпадений
+        matches = cp.all(hmac_results == target_hmac, axis=1)
+        if cp.any(matches):
+            found_idx = cp.where(matches)[0][0]
+            found_password = ''.join(chr(b) for b in passwords_batch[found_idx].get())
+            total_time = time.time() - start_time
+            print(f"\n✅ ПАРОЛЬ НАЙДЕН: '{found_password}'")
+            print(f"⏱️  Время поиска: {total_time:.2f} секунд")
+            print(f"🔍 Проверено комбинаций: {batch_start + found_idx + 1:,}")
+            print(f"⚡ Средняя скорость: {total_tested/total_time:,.0f} HMAC/сек")
+            break
+        
+        total_tested += current_batch_size
+        total_hmacs += current_batch_size
+    
+    if not found_password:
+        total_time = time.time() - start_time
+        print(f"\n💥 Пароль не найден")
+        print(f"⏱️  Проверено: {total_tested:,} комбинаций за {total_time:.2f} секунд")
+        print(f"⚡ Средняя скорость: {total_tested/total_time:,.0f} HMAC/сек")
+    
+    return found_password
 
-# ТЕСТИРУЕМ ОБЕ ВЕРСИИ# ЗАПУСКАЕМ СНАЧАЛА БЫСТРЫЙ ТЕСТ
+def calculate_bruteforce_time():
+    """Расчет времени для полного перебора"""
+    print("🧮 РАСЧЕТ ВРЕМЕНИ ПЕРЕБОРА:")
+    print("=" * 50)
+    
+    # Параметры
+    chars_count = 52  # A-Za-z
+    password_length = 8
+    total_combinations = chars_count ** password_length
+    
+    # Предполагаемая скорость на RTX 4080
+    speeds = [
+        1_000_000,    # Пессимистично
+        5_000_000,    # Реалистично  
+        10_000_000,   # Оптимистично
+        50_000_000    # Максимально (с оптимизациями)
+    ]
+    
+    print(f"🔤 Символы: {chars_count} (A-Z, a-z)")
+    print(f"📏 Длина: {password_length}")
+    print(f"📈 Комбинаций: {total_combinations:,}")
+    print()
+    
+    for speed in speeds:
+        seconds = total_combinations / speed
+        hours = seconds / 3600
+        days = hours / 24
+        years = days / 365
+        
+        print(f"При {speed:,} HMAC/сек:")
+        print(f"  ⏱️  {seconds:,.0f} секунд")
+        print(f"  ⏱️  {hours:,.1f} часов") 
+        print(f"  ⏱️  {days:,.1f} дней")
+        print(f"  ⏱️  {years:,.2f} лет")
+        print()
+
+def smart_bruteforce_with_patterns(target_hmac_hex, target_message="#FF0000"):
+    """Умный брутфорс с приоритетом вероятных паттернов"""
+    print("🎯 SMART BRUTEFORCE - COMMON PATTERNS FIRST")
+    
+    # Сначала проверяем самые вероятные паттерны
+    common_patterns = [
+        # Слова и имена
+        "Password", "password", "SECRET", "secret", "Key", "KEY",
+        "Admin", "admin", "User", "USER", "Login", "LOGIN",
+        "Access", "ACCESS", "Token", "TOKEN", "Auth", "AUTH",
+        
+        # Комбинации букв
+        "ABCDEFGH", "abcdefgh", "AaBbCcDd", "QwErTyUi",
+        "TestTest", "TESTTEST", "DemoDemo", "DEMODEMO",
+        
+        # Повторяющиеся
+        "AAAAAAAA", "aaaaaaaa", "AAAAaaaa", "aaaAAAAA",
+        
+        # Популярные слова (8 букв)
+        "Business", "Security", "Computer", "Internet",
+        "Software", "Hardware", "Terminal", "Firewall"
+    ]
+    
+    target_message_bytes = cp.array([ord(c) for c in target_message], dtype=cp.uint8)
+    target_hmac = cp.array([int(target_hmac_hex[i:i+2], 16) for i in range(0, 64, 2)], dtype=cp.uint8)
+    
+    print("🔍 Проверяем распространенные паттерны...")
+    
+    for pattern in common_patterns:
+        if len(pattern) == 8:
+            # Проверяем этот паттерн
+            key_bytes = cp.array([ord(c) for c in pattern], dtype=cp.uint8)
+            hmac_result = compute_hmac_sha256_gpu(target_message_bytes, key_bytes)
+            
+            if cp.array_equal(hmac_result, target_hmac):
+                print(f"✅ ПАРОЛЬ НАЙДЕН В ПАТТЕРНАХ: '{pattern}'")
+                return pattern
+    
+    print("💥 В паттернах не найден, начинаем полный перебор...")
+    return full_bruteforce_letters_only(target_hmac_hex, target_message)
+
+
+# # ТЕСТИРУЕМ ОБЕ ВЕРСИИ# ЗАПУСКАЕМ СНАЧАЛА БЫСТРЫЙ ТЕСТ
+# if __name__ == "__main__":
+#     print("🚀 ЗАПУСК ПОЛНОСТЬЮ ВЕКТОРИЗОВАННОЙ АТАКИ")
+#     print("=" * 60)
+#     
+#     # Тест с 3 неизвестными символами (должен быть быстрым)
+#     result = partial_key_attack_full_gpu(
+#         known_part="KAPOT",  # 5 известных символов
+#         known_position=0,
+#         target_message="#FF0000", 
+#         target_password="KAPOTeam"
+#     )
+#     
+#     if result:
+#         print(f"\n🎉 УСПЕХ! Найден пароль: {result}")
+#     else:
+#         print(f"\n💥 Пароль не найден")
+#         
+#         # Пробуем с меньшим количеством известных символов
+#     print("\n🔄 Пробуем с 4 известными символами...")
+#     result2 = partial_key_attack_full_gpu(
+#             known_part="KAPO",  # 4 известных символа
+#             known_position=0,
+#             target_message="#FF0000",
+#             target_password="KAPOTeam" 
+#     )
+#         
+#     if result2:
+#         print(f"\n🎉 УСПЕХ! Найден пароль: {result}")
+#     else:
+#         print(f"\n💥 Пароль не найден")
+# ОБНОВЛЕННЫЙ MAIN БЛОК В КОНЦЕ ФАЙЛА:
 if __name__ == "__main__":
-    print("🚀 ЗАПУСК ПОЛНОСТЬЮ ВЕКТОРИЗОВАННОЙ АТАКИ")
+    print("🚀 HMAC-SHA256 BRUTEFORCE - LETTERS ONLY")
     print("=" * 60)
     
-    # Тест с 3 неизвестными символами (должен быть быстрым)
-    result = partial_key_attack_full_gpu(
-        known_part="KAPOT",  # 5 известных символов
-        known_position=0,
-        target_message="#FF0000", 
-        target_password="KAPOTeam"
-    )
+    # Целевой HMAC для ключа "KAPOTeam" и сообщения "#FF0000"
+    TARGET_HMAC = "1a2ffdbf99949896a67c256f2e1c8c76cb9aaa31d08e4a4e56fae1a5c3dc64aa"
+    TARGET_MESSAGE = "#FF0000"
+    
+    # Сначала расчет времени
+    calculate_bruteforce_time()
+    
+    # Затем умный брутфорс
+    print("🎯 ЗАПУСК УМНОГО БРУТФОРСА:")
+    result = smart_bruteforce_with_patterns(TARGET_HMAC, TARGET_MESSAGE)
     
     if result:
-        print(f"\n🎉 УСПЕХ! Найден пароль: {result}")
+        print(f"\n🎉 УСПЕХ! Найден ключ: '{result}'")
+        print(f"💬 Для сообщения: '{TARGET_MESSAGE}'")
+        print(f"🔑 HMAC: {TARGET_HMAC}")
     else:
-        print(f"\n💥 Пароль не найден")
-        
-        # Пробуем с меньшим количеством известных символов
-    print("\n🔄 Пробуем с 4 известными символами...")
-    result2 = partial_key_attack_full_gpu(
-            known_part="KAPO",  # 4 известных символа
-            known_position=0,
-            target_message="#FF0000",
-            target_password="KAPOTeam" 
-    )
-        
-    if result2:
-        print(f"\n🎉 УСПЕХ! Найден пароль: {result}")
-    else:
-        print(f"\n💥 Пароль не найден")
+        print(f"\n💥 Ключ не найден")55
