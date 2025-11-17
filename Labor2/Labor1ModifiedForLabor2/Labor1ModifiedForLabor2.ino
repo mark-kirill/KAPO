@@ -25,6 +25,9 @@ bool wifiClientMode = false;
 String clientSSID = "";
 String clientPassword = "";
 
+unsigned long lastCommandTime = 0;
+String lastMessage = "";
+
 uint8_t currentRed = 0, currentGreen = 0, currentBlue = 0;
 
 const char *PREF_NS = "wifi-info";
@@ -128,6 +131,8 @@ void handleSerialCommands() {
 }
 // Функция проверки HMAC подписи
 bool verifyHMAC(String message, String receivedSignature) {
+
+  
   if (!cryptoEnabled || cryptoKey.length() == 0) return false;
 
   byte hmacResult[32];
@@ -149,6 +154,31 @@ bool verifyHMAC(String message, String receivedSignature) {
   calculatedSignature[64] = 0;
 
   return (receivedSignature.equals(calculatedSignature));
+}
+
+bool verifyHMACWithTimestamp(String fullMessage, String receivedSignature) {
+    Serial.println("=== HMAC WITH TIMESTAMP ===");
+    Serial.println("Full message: " + fullMessage);
+    Serial.println("Received signature: " + receivedSignature);
+
+        if (fullMessage == lastMessage && millis() - lastCommandTime < 5000) {
+        Serial.println("❌ Duplicate message - possible replay attack");
+        return false;
+    }
+    
+    bool result = verifyHMAC(fullMessage, receivedSignature);
+    
+    if (result) {
+        // Сохраняем время и сообщение
+        lastCommandTime = millis();
+        lastMessage = fullMessage;
+        Serial.println("✅ HMAC valid - command accepted");
+    } else {
+        Serial.println("❌ HMAC invalid");
+    }
+    
+    Serial.println("========================");
+    return result;
 }
 
 // Функция для загрузки крипто-ключа
@@ -244,22 +274,59 @@ void setup() {
   });
 
   // Set color endpoint
-  server.on("/set", HTTP_GET, [](AsyncWebServerRequest *request) {
+server.on("/set", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (wifiClientMode && cryptoEnabled) {
-      if (!request->hasParam("signature")) {
-        request->send(401, "text/plain", "Signature required in client mode");
-        return;
-      }
-      String signature = request->getParam("signature")->value();
-      String message = "";
-      if (request->hasParam("value")) {
-        message = request->getParam("value")->value();
-      }
-
-      if (!verifyHMAC(message, signature)) {
-        request->send(401, "text/plain", "Invalid signature");
-        return;
-      }
+        if (!request->hasParam("signature")) {
+            request->send(401, "text/plain", "Signature required in client mode");
+            return;
+        }
+        String signature = request->getParam("signature")->value();
+        String message = "";
+        
+        if (request->hasParam("value")) {
+            message = request->getParam("value")->value();
+            
+            // 🔥 ВАЖНО: Если сообщение содержит временную метку, извлекаем цвет
+            int colonIndex = message.indexOf(':');
+            if (colonIndex != -1) {
+                // Формат "цвет:время" - извлекаем цвет
+                String colorPart = message.substring(0, colonIndex);
+                String timestampPart = message.substring(colonIndex + 1);
+                
+                // Проверяем подпись всего сообщения
+                if (!verifyHMACWithTimestamp(message, signature)) {
+                    Serial.println("Proverka");
+                    request->send(401, "text/plain", "Invalid signature");
+                    return;
+                }
+                
+                // Устанавливаем цвет
+                String val = colorPart;
+                Serial.println("currentColor "+ getColorHex());
+                val.replace("%23", "#");
+                val.trim();
+                if (val.length() == 6 && val.charAt(0) != '#') val = "#" + val;
+                
+                if (validateHexColor(val)) {
+                    setColorFromHex(val);
+                    Serial.println("SetTOColor "+ val);
+                    if(getColorHex()==val)
+                      request->send(200, "text/html", "<html><body><h3>Color set to " + val + "</h3><a href='/'>Back</a></body></html>");
+                    else
+                      request->send(400, "text/plain", "INVALID HMAC or NOT EXIST");
+                    return;
+                } else {
+                    request->send(400, "text/plain", "Invalid color format: " + val);
+                    return;
+                }
+            }
+        }
+        
+        // Если нет временной метки, используем старую логику
+        if (!verifyHMAC(message, signature)) {
+            request->send(401, "text/plain", "Invalid signature");
+            return;
+        }
     }
     if (!isRequestAuthenticated(request)) {
       requireAuthOrRedirect(request);
