@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Data - {{ device_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .device-info {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .custom-time {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+        }
+        .custom-time.active {
+            display: block;
+        }
+        .custom-time input {
+            margin-bottom: 10px;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            margin-right: 10px;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .quick-export {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .quick-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .quick-link {
+            background: #2196F3;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .quick-link:hover {
+            background: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 Export Data</h1>
+
+        <div class="device-info">
+            <strong>Device ID:</strong> {{ device_id }}<br>
+            <strong>Exporting data from InfluxDB</strong>
+        </div>
+
+        <form method="POST">
+            <div class="form-group">
+                <label>Export Format:</label>
+                <select name="format">
+                    <option value="csv">CSV (Excel compatible)</option>
+                    <option value="json">JSON (for developers)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Time Range:</label>
+                <select name="time_range" id="timeRange" onchange="toggleCustomTime()">
+                    <option value="last_hour">Last Hour</option>
+                    <option value="last_24h">Last 24 Hours</option>
+                    <option value="last_week">Last Week</option>
+                    <option value="last_month">Last Month</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </div>
+
+            <div id="customTime" class="custom-time">
+                <div class="form-group">
+                    <label>Custom Start Time:</label>
+                    <input type="datetime-local" name="custom_start" id="customStart">
+                </div>
+                <div class="form-group">
+                    <label>Custom End Time:</label>
+                    <input type="datetime-local" name="custom_end" id="customEnd">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Maximum Records (0 = unlimited):</label>
+                <input type="number" name="limit" value="10000" min="0" max="1000000">
+                <small>Note: Large exports may take time to process</small>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn">📥 Start Export</button>
+                <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+        </form>
+
+        <div class="quick-export">
+            <h3>🚀 Quick Export</h3>
+            <p>Export with one click using predefined settings:</p>
+            <div class="quick-links">
+                <a href="/device/{{ device_id }}/quick_export/last_hour" class="quick-link">
+                    ⏱️ Last Hour (CSV)
+                </a>
+                <a href="/device/{{ device_id }}/quick_export/last_24h" class="quick-link">
+                    📅 Last 24 Hours (CSV)
+                </a>
+                <a href="/device/{{ device_id }}/quick_export/last_week" class="quick-link">
+                    📆 Last Week (CSV)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCustomTime() {
+            const timeRange = document.getElementById('timeRange');
+            const customTime = document.getElementById('customTime');
+
+            if (timeRange.value === 'custom') {
+                customTime.classList.add('active');
+            } else {
+                customTime.classList.remove('active');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleCustomTime();
+
+            // Set default times
+            const now = new Date();
+            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+            const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+            // Format for datetime-local input
+            function formatDateTime(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+
+            // Set default values
+            document.getElementById('customStart').value = formatDateTime(oneDayAgo);
+            document.getElementById('customEnd').value = formatDateTime(now);
+        });
+    </script>
+</body>
+</html>
+root@Narva-VPN2:~# sudo cat /var/www/webApp/templates/
+export_form.html   index.html         indexV3.html       indexWorking.html  login.html
+root@Narva-VPN2:~# sudo cat /var/www/webApp/templates/login.html
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <title>Sisselogimine</title>
+</head>
+<body>
+    <h2>Sisselogimine</h2>
+    {% if error %}
+    <p style="color:red;">{{ error }}</p>
+    {% endif %}
+    <form method="post">
+        <label>Kasutajanimi:</label>
+        <input type="text" name="username" required><br><br>
+        <label>Parool:</label>
+        <input type="password" name="password" required><br><br>
+        <button type="submit">Logi sisse</button>
+    </form>
+</body>
+</html>
+
+root@Narva-VPN2:~# sudo cat /var/www/webApp/templates/index.html
+<!doctype html>
+<html>
+<head>
+    <title>IoT Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.0/dist/chartjs-plugin-zoom.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-box {
+            flex: 1;
+            height: 300px;
+            position: relative;
+        }
+        .chart-controls {
+            margin-bottom: 10px;
+        }
+        .btn-sm {
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body class="p-4">
+<h1>Devices</h1>
+<table class="table table-bordered">
+<thead>
+<tr>
+    <th>Device</th>
+    <th>ID</th>
+    <th>Last seen</th>
+    <th>Status</th>
+    <th>Current Pressure</th>
+    <th>Valve State</th>
+    <th>Export</th>
+</tr>
+</thead>
+<tbody>
+{% for uid, dev in devices.items() %}
+<tr>
+    <td>{{ uid }}</td>
+    <td>{{ dev.get('description', '') }}</td>
+    <td>{{ dev['relative_time'] }}</td>
+    <td>{{ dev['status'] }}</td>
+    <td id="pressure-{{ uid }}">--</td>
+    <td id="valve-{{ uid }}">--</td>
+    <td>
+        <a href="/device/{{ uid }}/export" title="Custom Export">📊</a>
+        <a href="/device/{{ uid }}/quick_export/last_hour" title="Last Hour CSV">⏱️</a>
+        <a href="/device/{{ uid }}/quick_export/last_24h" title="Last 24h CSV">📅</a>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<hr>
+<h2>Device Graphs</h2>
+
+{% for uid, dev in devices.items() %}
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5>{{ uid }} ({{ dev['status'] }})</h5>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary" onclick="resetZoom('{{ uid }}')">
+                Reset Zoom
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleAutoRefresh('{{ uid }}')"
+                    id="refresh-btn-{{ uid }}">
+                ⏸️ Pause
+            </button>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <!-- График давления -->
+        <div class="chart-box">
+            <div class="chart-controls">
+                <small>Pressure (bar) - Drag to zoom, Scroll to zoom, Double-click to reset</small>
+            </div>
+            <canvas id="pressure-chart-{{ uid }}"></canvas>
+        </div>
+        <!-- График клапана -->
+        <div class="chart-box">
+            <div class="chart-controls">
+                <small>Valve State - Drag to zoom, Scroll to zoom, Double-click to reset</small>
+            </div>
+            <canvas id="valve-chart-{{ uid }}"></canvas>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+// Глобальные переменные для управления автообновлением
+const refreshIntervals = {};
+const autoRefreshState = {};
+
+{% for uid, dev in devices.items() %}
+// График давления с зумом
+const pressureCtx_{{ uid }} = document.getElementById('pressure-chart-{{ uid }}');
+const pressureChart_{{ uid }} = new Chart(pressureCtx_{{ uid }}, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Pressure (bar)',
+            data: [],
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 2,
+            pointHoverRadius: 5
+        }]
+    },
+    options: {
+        animation: false,
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        plugins: {
+            zoom: {
+                pan: {
+                    enabled: true,
+                    mode: 'x',
+                    modifierKey: 'ctrl'
+                },
+                zoom: {
+                    wheel: {
+                        enabled: true,
+                    },
+                    pinch: {
+                        enabled: true
+                    },
+                    mode: 'x',
+                    drag: {
+                        enabled: true,
+                        backgroundColor: 'rgba(75, 192, 192, 0.3)',
+                        borderColor: 'rgba(75, 192, 192, 0.8)',
+                        borderWidth: 1
+                    }
+                }
+            },
+            legend: {
+                display: true,
+                position: 'top'
+            }
+        },
+        scales: {
+            x: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Time'
+                }
+            },
+            y: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Pressure (bar)'
+                }
+            }
+        }
+    },
+    plugins: [ChartZoom]
+});
+
+// График состояния клапана с зумом
+const valveCtx_{{ uid }} = document.getElementById('valve-chart-{{ uid }}');
+const valveChart_{{ uid }} = new Chart(valveCtx_{{ uid }}, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Valve State',
+            data: [],
+            borderColor: 'rgba(255, 99, 132, 1)',
+            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+            fill: true,
+            borderWidth: 2,
+            stepped: true,
+            pointRadius: 2,
+            pointHoverRadius: 5
+        }]
+    },
+    options: {
+        animation: false,
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        plugins: {
+            zoom: {
+                pan: {
+                    enabled: true,
+                    mode: 'x',
+                    modifierKey: 'ctrl'
+                },
+                zoom: {
+                    wheel: {
+                        enabled: true,
+                    },
+                    pinch: {
+                        enabled: true
+                    },
+                    mode: 'x',
+                    drag: {
+                        enabled: true,
+                        backgroundColor: 'rgba(255, 99, 132, 0.3)',
+                        borderColor: 'rgba(255, 99, 132, 0.8)',
+                        borderWidth: 1
+                    }
+                }
+            },
+            legend: {
+                display: true,
+                position: 'top'
+            }
+        },
+        scales: {
+            x: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Time'
+                }
+            },
+            y: {
+                display: true,
+                min: -0.1,
+                max: 1.1,
+                ticks: {
+                    callback: function(value) {
+                        if (value === 0) return 'Closed';
+                        if (value === 1) return 'Open';
+                        return '';
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'State'
+                }
+            }
+        }
+    },
+    plugins: [ChartZoom]
+});
+
+function updateChart_{{ uid }}() {
+    // Запрос за последние 24 часа
+    fetch('/device/{{ uid }}/history')
+        .then(r => r.json())
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) return;
+
+            // Фильтруем данные за последние 24 часа
+            const now = new Date();
+            const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+            const last24hData = data.filter(p => {
+                const pointTime = new Date(p.time);
+                return pointTime > yesterday;
+            });
+
+            // Если нет данных за 24ч, берем все доступные
+            const recentData = last24hData.length > 0 ?
+                last24hData : data.slice(-100);
+
+            // Формируем метки времени
+            const labels = recentData.map(p => {
+                const date = new Date(p.time);
+                return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            });
+
+            // Давление
+            const pressureValues = recentData.map(p =>
+                Number(p.pressure_now) || 0
+            );
+
+            // Состояние клапана
+            const valveValues = recentData.map(p =>
+                p.valve_state === 'open' ? 1 : 0
+            );
+
+            // Обновляем график давления (только если автообновление включено)
+            if (autoRefreshState['{{ uid }}'] !== false) {
+                pressureChart_{{ uid }}.data.labels = labels;
+                pressureChart_{{ uid }}.data.datasets[0].data = pressureValues;
+                pressureChart_{{ uid }}.update('none');
+            }
+
+            // Обновляем график клапана (только если автообновление включено)
+            if (autoRefreshState['{{ uid }}'] !== false) {
+                valveChart_{{ uid }}.data.labels = labels;
+                valveChart_{{ uid }}.data.datasets[0].data = valveValues;
+                valveChart_{{ uid }}.update('none');
+            }
+
+            // Всегда обновляем таблицу
+            if (recentData.length > 0) {
+                const latest = recentData[recentData.length - 1];
+                document.getElementById('pressure-{{ uid }}').textContent =
+                    latest.pressure_now ? latest.pressure_now.toFixed(2) + ' bar' : '--';
+                document.getElementById('valve-{{ uid }}').textContent =
+                    latest.valve_state || '--';
+            }
+        })
+        .catch(err => console.error("Ошибка обновления графика {{ uid }}", err));
+}
+
+// Начинаем автообновление
+autoRefreshState['{{ uid }}'] = true;
+refreshIntervals['{{ uid }}'] = setInterval(updateChart_{{ uid }}, 2000);
+updateChart_{{ uid }}();
+
+{% endfor %}
+
+// Функции управления зумом
+function resetZoom(uid) {
+    if (window[`pressureChart_${uid}`]) {
+        window[`pressureChart_${uid}`].resetZoom();
+    }
+    if (window[`valveChart_${uid}`]) {
+        window[`valveChart_${uid}`].resetZoom();
+    }
+}
+
+function toggleAutoRefresh(uid) {
+    const btn = document.getElementById(`refresh-btn-${uid}`);
+
+    if (autoRefreshState[uid]) {
+        // Пауза
+        if (refreshIntervals[uid]) {
+            clearInterval(refreshIntervals[uid]);
+            refreshIntervals[uid] = null;
+        }
+        autoRefreshState[uid] = false;
+        btn.innerHTML = '▶️ Resume';
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-outline-success');
+    } else {
+        // Возобновление
+        if (!refreshIntervals[uid]) {
+            refreshIntervals[uid] = setInterval(
+                () => window[`updateChart_${uid}`](),
+                2000
+            );
+        }
+        autoRefreshState[uid] = true;
+        btn.innerHTML = '⏸️ Pause';
+        btn.classList.remove('btn-outline-success');
+        btn.classList.add('btn-outline-secondary');
+        // Сразу обновляем
+        window[`updateChart_${uid}`]();
+    }
+}
+
+// Обработчики для управления зумом с клавиатуры
+document.addEventListener('keydown', function(e) {
+    // Ctrl + 1-9 - reset zoom для соответствующего устройства
+    if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+        const index = parseInt(e.key) - 1;
+        const devices = document.querySelectorAll('.mb-4');
+        if (devices[index]) {
+            const uid = devices[index].querySelector('h5').textContent.split(' ')[0];
+            resetZoom(uid);
+        }
+    }
+});
+</script>
+</body>
+</html>

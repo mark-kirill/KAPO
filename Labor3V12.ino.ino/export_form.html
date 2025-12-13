@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Data - {{ device_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .device-info {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .custom-time {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+        }
+        .custom-time.active {
+            display: block;
+        }
+        .custom-time input {
+            margin-bottom: 10px;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            margin-right: 10px;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .quick-export {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .quick-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .quick-link {
+            background: #2196F3;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .quick-link:hover {
+            background: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 Export Data</h1>
+
+        <div class="device-info">
+            <strong>Device ID:</strong> {{ device_id }}<br>
+            <strong>Exporting data from InfluxDB</strong>
+        </div>
+
+        <form method="POST">
+            <div class="form-group">
+                <label>Export Format:</label>
+                <select name="format">
+                    <option value="csv">CSV (Excel compatible)</option>
+                    <option value="json">JSON (for developers)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Time Range:</label>
+                <select name="time_range" id="timeRange" onchange="toggleCustomTime()">
+                    <option value="last_hour">Last Hour</option>
+                    <option value="last_24h">Last 24 Hours</option>
+                    <option value="last_week">Last Week</option>
+                    <option value="last_month">Last Month</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </div>
+
+            <div id="customTime" class="custom-time">
+                <div class="form-group">
+                    <label>Custom Start Time:</label>
+                    <input type="datetime-local" name="custom_start" id="customStart">
+                </div>
+                <div class="form-group">
+                    <label>Custom End Time:</label>
+                    <input type="datetime-local" name="custom_end" id="customEnd">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Maximum Records (0 = unlimited):</label>
+                <input type="number" name="limit" value="10000" min="0" max="1000000">
+                <small>Note: Large exports may take time to process</small>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn">📥 Start Export</button>
+                <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+        </form>
+
+        <div class="quick-export">
+            <h3>🚀 Quick Export</h3>
+            <p>Export with one click using predefined settings:</p>
+            <div class="quick-links">
+                <a href="/device/{{ device_id }}/quick_export/last_hour" class="quick-link">
+                    ⏱️ Last Hour (CSV)
+                </a>
+                <a href="/device/{{ device_id }}/quick_export/last_24h" class="quick-link">
+                    📅 Last 24 Hours (CSV)
+                </a>
+                <a href="/device/{{ device_id }}/quick_export/last_week" class="quick-link">
+                    📆 Last Week (CSV)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCustomTime() {
+            const timeRange = document.getElementById('timeRange');
+            const customTime = document.getElementById('customTime');
+
+            if (timeRange.value === 'custom') {
+                customTime.classList.add('active');
+            } else {
+                customTime.classList.remove('active');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleCustomTime();
+
+            // Set default times
+            const now = new Date();
+            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+            const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+            // Format for datetime-local input
+            function formatDateTime(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+
+            // Set default values
+            document.getElementById('customStart').value = formatDateTime(oneDayAgo);
+            document.getElementById('customEnd').value = formatDateTime(now);
+        });
+    </script>
+</body>
+</html>
