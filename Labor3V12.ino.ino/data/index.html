@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valve Control - Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .info-panel {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .info-panel h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        .status-indicator.connected {
+            background: #51cf66;
+        }
+        .status-indicator.disconnected {
+            background: #ff6b6b;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .valve-control {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        .btn-open {
+            background: #51cf66;
+            color: white;
+        }
+        .btn-open:hover {
+            background: #40c057;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(81, 207, 102, 0.4);
+        }
+        .btn-close {
+            background: #ff6b6b;
+            color: white;
+        }
+        .btn-close:hover {
+            background: #fa5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        .config-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+        }
+        .config-section h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #495057;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-submit {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        .logout {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .logout a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .logout a:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .alert strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚰 Valve Control System</h1>
+        <p class="subtitle">Local Configuration Interface</p>
+        
+        <div class="alert">
+            <strong>⚠️ Note:</strong>
+            This is the local configuration interface. The central dashboard is hosted on the MQTT server.
+        </div>
+
+        <div class="info-panel">
+            <h3>Device Status</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Device UID</div>
+                    <div class="info-value" id="deviceUID">Loading...</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Valve State</div>
+                    <div class="info-value" id="valveState">
+                        <span class="status-indicator disconnected"></span>
+                        Loading...
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Current Pressure</div>
+                    <div class="info-value" id="pressure">-- bar</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Buffer</div>
+                    <div class="info-value" id="buffer">0/100</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">WiFi Mode</div>
+                    <div class="info-value" id="wifiMode">--</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">MQTT Status</div>
+                    <div class="info-value" id="mqttStatus">
+                        <span class="status-indicator disconnected"></span>
+                        Disconnected
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="valve-control">
+            <button class="btn btn-open" onclick="setValve('open')">Open Valve</button>
+            <button class="btn btn-close" onclick="setValve('close')">Close Valve</button>
+        </div>
+
+        <div class="config-section">
+            <h2>WiFi Configuration</h2>
+            <form onsubmit="saveWiFi(event)">
+                <div class="form-group">
+                    <label for="ssid">SSID</label>
+                    <input type="text" id="ssid" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password (min 8 chars)</label>
+                    <input type="password" id="password" minlength="8" required>
+                </div>
+                <button type="submit" class="btn-submit">Save WiFi & Reboot</button>
+            </form>
+        </div>
+
+        <div class="config-section">
+            <h2>MQTT Configuration</h2>
+            <form onsubmit="saveMQTT(event)">
+                <div class="form-group">
+                    <label for="mqttServer">MQTT Server</label>
+                    <input type="text" id="mqttServer" placeholder="broker.hivemq.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="mqttPort">Port</label>
+                    <input type="number" id="mqttPort" value="1883" required>
+                </div>
+                <div class="form-group">
+                    <label for="mqttUser">Username (optional)</label>
+                    <input type="text" id="mqttUser">
+                </div>
+                <div class="form-group">
+                    <label for="mqttPassword">Password (optional)</label>
+                    <input type="password" id="mqttPassword">
+                </div>
+                <div class="form-group">
+                    <label for="mqttTopic">Base Topic</label>
+                    <input type="text" id="mqttTopic" value="sensors" required>
+                </div>
+                <button type="submit" class="btn-submit">Save MQTT Config</button>
+            </form>
+        </div>
+
+        <div class="logout">
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <script>
+        async function updateStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                document.getElementById('deviceUID').textContent = data.device_uid;
+                document.getElementById('pressure').textContent = data.pressure + ' bar';
+                document.getElementById('buffer').textContent = data.buffer_size + '/100';
+                document.getElementById('wifiMode').textContent = data.wifi_mode.toUpperCase();
+                
+                const valveState = document.getElementById('valveState');
+                const valveIndicator = valveState.querySelector('.status-indicator');
+                if (data.valve_state === 'open') {
+                    valveState.innerHTML = '<span class="status-indicator connected"></span>OPEN';
+                } else {
+                    valveState.innerHTML = '<span class="status-indicator disconnected"></span>CLOSED';
+                }
+                
+                const mqttStatus = document.getElementById('mqttStatus');
+                if (data.mqtt_connected) {
+                    mqttStatus.innerHTML = '<span class="status-indicator connected"></span>Connected';
+                } else {
+                    mqttStatus.innerHTML = '<span class="status-indicator disconnected"></span>Disconnected';
+                }
+            } catch (error) {
+                console.error('Failed to fetch status:', error);
+            }
+        }
+
+        async function setValve(state) {
+            try {
+                const formData = new FormData();
+                formData.append('state', state);
+                
+                const response = await fetch('/valve', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    await updateStatus();
+                } else {
+                    alert('Failed to set valve state');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error setting valve state');
+            }
+        }
+
+        async function saveWiFi(event) {
+            event.preventDefault();
+            if (!confirm('Device will reboot after saving WiFi settings. Continue?')) {
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('ssid', document.getElementById('ssid').value);
+            formData.append('password', document.getElementById('password').value);
+            
+            try {
+                const response = await fetch('/setwifi', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    alert('WiFi saved! Device is rebooting...');
+                } else {
+                    alert('Failed to save WiFi settings');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function saveMQTT(event) {
+            event.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('server', document.getElementById('mqttServer').value);
+            formData.append('port', document.getElementById('mqttPort').value);
+            formData.append('user', document.getElementById('mqttUser').value);
+            formData.append('password', document.getElementById('mqttPassword').value);
+            formData.append('topic', document.getElementById('mqttTopic').value);
+            
+            try {
+                const response = await fetch('/setmqtt', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    alert('MQTT configuration saved!');
+                    await updateStatus();
+                } else {
+                    alert('Failed to save MQTT settings');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        updateStatus();
+        setInterval(updateStatus, 2000);
+    </script>
+</body>
+</html>

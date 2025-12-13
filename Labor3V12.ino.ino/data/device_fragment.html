@@ -1,0 +1,179 @@
+<div class="device-card" data-device-uid="{{ uid }}">
+    <div class="device-header">
+        <h3>🚰 Valve {{ uid }}</h3>
+        <span class="status-badge {{ 'open' if valve_state == 'open' else 'closed' }}">
+            {{ valve_state.upper() }}
+        </span>
+    </div>
+    
+    <div class="device-metrics">
+        <div class="metric">
+            <div class="metric-label">Current Pressure</div>
+            <div class="metric-value">{{ pressure_now }} bar</div>
+        </div>
+        
+        <div class="metric">
+            <div class="metric-label">Pressure 30ms ago</div>
+            <div class="metric-value">{{ pressure_30ms_ago }} bar</div>
+        </div>
+        
+        <div class="metric">
+            <div class="metric-label">Pressure Delta</div>
+            <div class="metric-value delta">
+                {{ "%.2f"|format(pressure_now - pressure_30ms_ago) }} bar
+            </div>
+        </div>
+    </div>
+    
+    <div class="device-chart">
+        <canvas id="chart-{{ uid }}" width="400" height="200"></canvas>
+    </div>
+    
+    <div class="device-controls">
+        <button class="btn btn-open" onclick="controlValve('{{ uid }}', 'open')">
+            Open Valve
+        </button>
+        <button class="btn btn-close" onclick="controlValve('{{ uid }}', 'close')">
+            Close Valve
+        </button>
+    </div>
+    
+    <div class="device-footer">
+        <small>Last update: <span class="timestamp">{{ timestamp }}</span></small>
+    </div>
+</div>
+
+<style>
+.device-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.device-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.device-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.device-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 20px;
+}
+
+.status-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.open {
+    background: #51cf66;
+    color: white;
+}
+
+.status-badge.closed {
+    background: #ff6b6b;
+    color: white;
+}
+
+.device-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.metric {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.metric-value.delta {
+    color: #667eea;
+}
+
+.device-chart {
+    margin: 20px 0;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.device-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.btn-open {
+    background: #51cf66;
+    color: white;
+}
+
+.btn-open:hover {
+    background: #40c057;
+    transform: translateY(-2px);
+}
+
+.btn-close {
+    background: #ff6b6b;
+    color: white;
+}
+
+.btn-close:hover {
+    background: #fa5252;
+    transform: translateY(-2px);
+}
+
+.device-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
+    color: #666;
+}
+</style>
