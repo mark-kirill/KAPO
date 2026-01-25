@@ -1,0 +1,35 @@
+def get_pressure_reading():
+    socket_open("192.168.3.68", 80)   # M5Atom IP + port või meie bridge'i IP + port
+
+    # Send HTTP GET request
+    request = "GET /pressure HTTP/1.1\r\nHost: 192.168.3.68\r\n\r\n"
+    socket_send_string(request)
+
+    # Receive response
+    response = socket_read_string(prefix="close", interpret_escape=True, timeout=50)
+    socket_close()
+
+    return response
+end
+
+def pressure_to_angle(pressure):
+    minPressure = 100
+    maxPressure = 200
+    minAngle = 0
+    maxAngle = 80
+    degrees = (pressure-minPressure)*(maxAngle-minAngle)/(maxPressure-minPressure)
+    return degrees*3.14/180
+end
+
+pressure = get_pressure_reading()
+textmsg("Pressure reading: ", pressure)
+if(str_empty(pressure)==False):
+    floatPressure = to_num(pressure)
+    if(floatPressure < 0):
+        textmsg("Press button on M5Atom to start")
+    else:
+        currentPos = get_actual_joint_positions()
+        newAngle = pressure_to_angle(floatPressure)
+        movej([currentPos[0], currentPos[1], currentPos[2], currentPos[3], newAngle, currentPos[5]], a=1, v=1)
+    end
+end
