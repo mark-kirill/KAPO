@@ -171,3 +171,5 @@ Kõik toimub tsüklis while True.
 
 ✔ Modulaarne ja laiendatav süsteem
 
+✔ Videonäide kogu lahendusest: https://drive.google.com/file/d/1j6bUa6UbzdqLlmbJ6QtCs1KyUFSdi7St/view?usp=drive_link
+
